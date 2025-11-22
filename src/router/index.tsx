@@ -6,7 +6,7 @@ import ProblemPage from "../pages/ProblemPage.tsx";
 import ProblemSubmissionPage from "../pages/ProblemSubmissionPage.tsx";
 import ProblemResultsPage from "../pages/ProblemResultsPage.tsx";
 import StatisticsPage from "../pages/StatisticsPage.tsx";
-import TeacherTasksPage from "../pages/TeacherTasksPage.tsx";
+import TeacherPanelPage from "../pages/TeacherPanelPage.tsx";
 
 export interface IRoute {
     path: string;
@@ -28,7 +28,7 @@ export const publicRoutes: IRoute[] = [
     {path: RouteNames.PROBLEM_SET + '/submit/:id', element: <ProblemSubmissionPage/>},
     {path: RouteNames.PROBLEM_SET + '/results/:id', element: <ProblemResultsPage/>},
     {path: RouteNames.PROBLEM_SET + '/statistics/:id', element: <StatisticsPage/>},
-    {path: RouteNames.TEACHER_PANEL, element: <TeacherTasksPage/>},
+    {path: RouteNames.TEACHER_PANEL, element: <TeacherPanelPage/>},
 ];
 
 export const privateRoutes: IRoute[] = []

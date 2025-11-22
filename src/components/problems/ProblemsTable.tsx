@@ -1,7 +1,7 @@
 import React from 'react';
 import {Table} from "react-bootstrap";
 import ProblemRow from "./ProblemRow.tsx";
-import type IProblem from "../types";
+import type IProblem from "../../types";
 
 export interface ProblemsTableProps {
     problems: IProblem[];

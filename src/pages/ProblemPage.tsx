@@ -1,34 +1,47 @@
 import React, { useEffect, useState } from 'react';
-import Problem from "../components/Problem.tsx";
-import Navbar from "../components/Navbar.tsx";
+import Problem from "../components/problems/Problem.tsx";
+import Navbar from "../components/ui/Navbar.tsx";
 import type IProblem from "../types";
 import TabsNavigation from "../components/TabsNavigation.tsx";
-import { Link } from "react-router-dom";
-import { DownloadSolutionTemplate } from "../components/DownloadSolutionTemplate.tsx";
+import { Link, useParams } from "react-router-dom";
+import { DownloadSolutionTemplate } from "../components/problems/DownloadSolutionTemplate.tsx";
 
 const ProblemPage: React.FC = () => {
+    const { id } = useParams<{ id: string }>();
     const [problem, setProblem] = useState<IProblem | null>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (!id) return;
+
         const fetchProblem = async () => {
             try {
-                const response = await fetch("http://localhost:8000/api/tasks/6901d40da193662393825c47");
+                const response = await fetch(`http://localhost:8000/api/tasks/${id}`, {
+                    credentials: "include"
+                });
                 if (!response.ok) throw new Error("Failed to load problem");
                 const data = await response.json();
                 setProblem(data);
-                console.log(data);
             } catch (error) {
                 console.error("Error loading problem:", error);
+            } finally {
+                setLoading(false);
             }
         };
         fetchProblem();
-    }, []);
+    }, [id]);
 
-    if (!problem) return <div>Loading...</div>;
+    if (!id) {
+        return <div className="ml-60 mt-4 text-red-600">Invalid task id</div>;
+    }
+
+    if (loading || !problem) {
+        return <div className="ml-60 mt-4">Loading...</div>;
+    }
 
     return (
         <>
-            <Navbar/>
+            <Navbar />
 
             <Link
                 to='/problemset'
@@ -42,7 +55,7 @@ const ProblemPage: React.FC = () => {
                     { value: 'tasks', path: '/problemset' },
                     { value: 'submit', path: `/problemset/submit/${problem.id}` },
                     { value: 'result', path: `/problemset/results/${problem.id}` },
-                    { value: 'statistics', path: `/problemset/statistics/${problem.id}` },
+                    { value: 'statistics', path: `/problemset/statistics/${problem.id}` }
                 ]}
             />
 
@@ -57,7 +70,7 @@ const ProblemPage: React.FC = () => {
 
                 {problem.solutionTemplateFileId && (
                     <div className="mt-4">
-                        <DownloadSolutionTemplate solutionTemplateFileId={problem.solutionTemplateFileId}/>
+                        <DownloadSolutionTemplate solutionTemplateFileId={problem.solutionTemplateFileId} />
                     </div>
                 )}
             </div>

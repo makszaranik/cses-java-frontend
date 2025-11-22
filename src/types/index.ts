@@ -1,4 +1,4 @@
-export default interface IProblem {
+export interface IProblem {
     id: string;
     title: string;
     statement: string;
@@ -12,8 +12,31 @@ export default interface IProblem {
     submissionsNumberLimit: number;
 }
 
+export interface ISubmission {
+    id: string;
+    taskId: string;
+    userId: string;
+    sourceCodeFileId: string;
+    logs: string;
+    status: SubmissionStatus;
+    score: number;
+}
+
+export type SubmissionStatus =
+    "LINTER_PASSED" |
+    "LINTER_FAILED" |
+    "SUBMITTED" |
+    "COMPILING" |
+    "COMPILATION_SUCCESS" |
+    "COMPILATION_ERROR" |
+    "WRONG_ANSWER" |
+    "ACCEPTED" |
+    "TIME_LIMIT_EXCEEDED" |
+    "OUT_OF_MEMORY";
+
 export enum SubmissionFileType {
     SOLUTION = "SOLUTION",
+    SOLUTION_TEMPLATE = "SOLUTION_TEMPLATE",
     TEST = "TEST",
     LINTER = "LINTER",
 }
