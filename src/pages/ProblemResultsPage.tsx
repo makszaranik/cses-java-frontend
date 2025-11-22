@@ -3,98 +3,102 @@ import Navbar from "../components/ui/Navbar.tsx";
 import { Link, useLocation, useParams } from "react-router-dom";
 import TabsNavigation from "../components/TabsNavigation.tsx";
 import { Table, Badge, Modal, Button } from "react-bootstrap";
-import type {ISubmission, SubmissionStatus} from "../types"
+import type { ISubmission, SubmissionStatus } from "../types";
 
 const getBadgeVariant = (status: SubmissionStatus): string => {
     switch (status) {
-        case "ACCEPTED": return "success";
-        case "COMPILATION_SUCCESS": return "success";
-        case "LINTER_PASSED": return "success";
-        case "LINTER_FAILED": return "danger";
+        case "ACCEPTED":
+        case "COMPILATION_SUCCESS":
+        case "LINTER_PASSED":
+            return "success";
         case "COMPILATION_ERROR":
         case "WRONG_ANSWER":
-        case "TIME_LIMIT_EXCEEDED": return "danger";
-        case "SUBMITTED":return "secondary";
-        default: return "dark";
+        case "TIME_LIMIT_EXCEEDED":
+        case "LINTER_FAILED":
+            return "danger";
+        case "SUBMITTED":
+            return "secondary";
+        default:
+            return "dark";
     }
 };
 
 const ProblemResultsPage: React.FC = () => {
     const { id: taskId } = useParams<{ id: string }>();
     const location = useLocation();
-    const { state } = location as { state?: { submissionId?: string } };
-    const submissionIdToTrack = state?.submissionId;
+    const submissionIdToTrack = (location.state as any)?.submissionId;
 
     const [submissions, setSubmissions] = useState<ISubmission[]>([]);
     const [trackedSubmission, setTrackedSubmission] = useState<ISubmission | null>(null);
     const [showLogsModal, setShowLogsModal] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    const handleCloseLogsModal = () => setShowLogsModal(false);
     const handleShowLogsModal = (submission: ISubmission) => {
         setTrackedSubmission(submission);
         setShowLogsModal(true);
     };
 
+    const handleCloseLogsModal = () => setShowLogsModal(false);
+
     useEffect(() => {
         if (!taskId) return;
 
-        const fetchSubmissions = async () => {
+        const load = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/submissions/${taskId}/history`, {
+                const res = await fetch(`http://localhost:8000/api/submissions/${taskId}/history`, {
                     credentials: "include"
                 });
-                if (!response.ok) {
-                    throw new Error("Failed to load submissions");
-                }
-                const data = await response.json();
-                setSubmissions(data);
-            } catch (error) {
-                console.error("Error loading submissions:", error);
+
+                const data: ISubmission[] = await res.json();
+
+                setSubmissions(
+                    data.sort(
+                        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                    )
+                );
+            } catch (e) {
+                console.error("History load error:", e);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchSubmissions();
+        load();
     }, [taskId]);
 
     useEffect(() => {
         if (!submissionIdToTrack) return;
 
-        const eventSource = new EventSource(
+        const es = new EventSource(
             `http://localhost:8000/api/tasks/status?submissionId=${submissionIdToTrack}`,
             { withCredentials: true }
         );
 
-        eventSource.onopen = () => console.log("SSE Connection opened.");
-        eventSource.onmessage = (event) => {
+        es.onmessage = (event) => {
             try {
-                const updatedSubmission: ISubmission = JSON.parse(event.data);
-                setTrackedSubmission(updatedSubmission);
-                setSubmissions(prev => {
-                    const existingIndex = prev.findIndex(s => s.id === updatedSubmission.id);
-                    if (existingIndex === -1) {
-                        return [updatedSubmission, ...prev];
-                    }
-                    const next = [...prev];
-                    next[existingIndex] = updatedSubmission;
-                    return next;
+                const updated: ISubmission = JSON.parse(event.data);
+                setTrackedSubmission(updated);
+
+                setSubmissions((prev) => {
+                    const existing = prev.filter(s => s.id !== updated.id);
+                    return [
+                        updated,
+                        ...existing
+                    ].sort(
+                        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                    );
                 });
-            } catch (err) {
-                console.error("Error parsing SSE data:", err);
+            } catch (e) {
+                console.error("SSE parse error:", e);
             }
         };
 
-        eventSource.onerror = (err) => {
-            console.error("SSE Error:", err);
-            eventSource.close();
+        es.onerror = (err) => {
+            console.error("SSE error:", err);
+            es.close();
         };
 
-        return () => {
-            eventSource.close();
-            console.log("SSE Connection cleanup.");
-        };
+        return () => es.close();
     }, [submissionIdToTrack]);
 
     const taskIdText = taskId ?? "";
@@ -102,16 +106,22 @@ const ProblemResultsPage: React.FC = () => {
     return (
         <>
             <Navbar />
-            <Link to='/problemset' className="decoration-none text-2xl ml-60 mt-2 font-bold text-black no-underline">
+
+            <Link
+                to='/problemset'
+                className="decoration-none text-2xl ml-60 mt-2 font-bold text-black no-underline"
+            >
                 CSES Problem Set
             </Link>
 
-            <TabsNavigation options={[
-                { value: 'tasks', path: '/problemset' },
-                { value: 'submit', path: `/problemset/submit/${taskIdText}` },
-                { value: 'result', path: `/problemset/results/${taskIdText}` },
-                { value: 'statistics', path: `/problemset/statistics/${taskIdText}` }
-            ]} />
+            <TabsNavigation
+                options={[
+                    { value: 'tasks', path: '/problemset' },
+                    { value: 'submit', path: `/problemset/submit/${taskIdText}` },
+                    { value: 'result', path: `/problemset/results/${taskIdText}` },
+                    { value: 'statistics', path: `/problemset/statistics/${taskIdText}` }
+                ]}
+            />
 
             <div className="max-w-4xl mx-auto p-6">
                 <h2 className="text-3xl font-semibold mb-4">Results for Task {taskIdText}</h2>
@@ -129,22 +139,20 @@ const ProblemResultsPage: React.FC = () => {
                         </tr>
                         </thead>
                         <tbody>
-                        {submissions.map(submission => (
-                            <tr key={submission.id} style={{ cursor: 'pointer' }}>
-                                <td>{submission.id}</td>
-                                <td><Badge bg={getBadgeVariant(submission.status)}>{submission.status}</Badge></td>
-                                <td>{submission.score || "-"}</td>
+                        {submissions.map(sub => (
+                            <tr key={sub.id}>
+                                <td>{sub.id}</td>
+                                <td><Badge bg={getBadgeVariant(sub.status)}>{sub.status}</Badge></td>
+                                <td>{sub.score ?? "-"}</td>
                                 <td>
-                                    <Button variant="dark" size="sm" onClick={() => handleShowLogsModal(submission)}>
+                                    <Button variant="dark" size="sm" onClick={() => handleShowLogsModal(sub)}>
                                         Show
                                     </Button>
                                 </td>
                             </tr>
                         ))}
                         {submissions.length === 0 && (
-                            <tr>
-                                <td colSpan={5}>No submissions yet.</td>
-                            </tr>
+                            <tr><td colSpan={4}>No submissions yet.</td></tr>
                         )}
                         </tbody>
                     </Table>

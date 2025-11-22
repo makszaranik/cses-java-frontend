@@ -43,6 +43,7 @@ const FileUpload: React.FC<FileUploadProps> = ({fileType, buttonText="upload", o
 
             const res = await fetch("http://localhost:8000/api/files/upload", {
                 method: "POST",
+                credentials: "include",
                 body: fd
             });
 
@@ -50,7 +51,8 @@ const FileUpload: React.FC<FileUploadProps> = ({fileType, buttonText="upload", o
 
             const data = await res.json();
             const fileId = data.id;
-
+            console.log(fileId);
+            console.log(file);
             if (onFileUploaded) {
                 onFileUploaded(fileId);
             }
@@ -78,7 +80,7 @@ const FileUpload: React.FC<FileUploadProps> = ({fileType, buttonText="upload", o
             </div>
 
             <div className="flex ml-60 mt-3">
-                <Button onClick={handleUploadFile} disabled={isSubmitting}>
+                <Button onClick={handleUploadFile} variant="dark" disabled={isSubmitting}>
                     {isSubmitting ? "Uploading..." : buttonText}
                 </Button>
             </div>

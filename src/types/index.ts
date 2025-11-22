@@ -20,6 +20,7 @@ export interface ISubmission {
     logs: string;
     status: SubmissionStatus;
     score: number;
+    createdAt: Date;
 }
 
 export type SubmissionStatus =

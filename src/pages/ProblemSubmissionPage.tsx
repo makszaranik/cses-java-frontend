@@ -6,6 +6,7 @@ import { useAuthStore } from "../state";
 import { SubmissionFileType } from "../types";
 import FileUpload from "../components/files/FileUpload.tsx";
 import GitHubFileUpload from "../components/files/GitHubFileUpload.tsx";
+import {Button} from "react-bootstrap";
 
 const ProblemSubmissionPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -102,14 +103,19 @@ const ProblemSubmissionPage: React.FC = () => {
                         />
                     )}
 
-                    {uploadedFileId && mode === "FILE" && (
-                        <button
-                            className="ml-60 mt-4 bg-black text-white px-4 py-2 rounded"
-                            onClick={handleSubmitSolution}
-                        >
-                            Submit solution
-                        </button>
+                    {mode === "FILE" && (
+                        <div className="ml-60 mt-4 flex">
+                            <Button
+                                disabled={!uploadedFileId}
+                                variant="dark"
+                                className="text-white px-4 py-2 rounded"
+                                onClick={handleSubmitSolution}
+                            >
+                                Submit solution
+                            </Button>
+                        </div>
                     )}
+
 
                     {mode === "REPO" && (
                         <GitHubFileUpload taskId={taskId} autoLoad={true} />
