@@ -1,129 +1,158 @@
 import React, { useEffect, useState } from 'react';
-import Navbar from "../components/Navbar.tsx";
-import { Link, useLocation } from "react-router-dom";
-import TabsNavigation from "../components/TabsNavigation.tsx";
+import Navbar from "../components/ui/Navbar.tsx";
+import { Link, useLocation, useParams } from "react-router-dom";
+import TabsNavigation from "../components/ui/TabsNavigation.tsx";
 import { Table, Badge, Modal, Button } from "react-bootstrap";
-
-type SubmissionStatus =
-    "SUBMITTED" |
-    "COMPILING" |
-    "COMPILATION_SUCCESS" |
-    "COMPILATION_ERROR" |
-    "WRONG_ANSWER" |
-    "ACCEPTED" |
-    "TIME_LIMIT_EXCEEDED" |
-    "OUT_OF_MEMORY";
-
-interface ISubmission {
-    id: string;
-    taskId: string;
-    status: SubmissionStatus;
-    createdAt: string;
-    logs?: string;
-    userId?: string;
-}
+import type { ISubmission, SubmissionStatus } from "../types";
 
 const getBadgeVariant = (status: SubmissionStatus): string => {
     switch (status) {
-        case "ACCEPTED": return "success";
-        case "COMPILATION_SUCCESS": return "success"
-        case "COMPILATION_ERROR": return "danger";
-        case "WRONG_ANSWER": return "danger"
-        case "TIME_LIMIT_EXCEEDED": return "danger"
-        case "SUBMITTED": return "secondary";
-        default: return "dark";
+        case "ACCEPTED":
+        case "COMPILATION_SUCCESS":
+        case "LINTER_PASSED":
+            return "success";
+        case "COMPILATION_ERROR":
+        case "WRONG_ANSWER":
+        case "TIME_LIMIT_EXCEEDED":
+        case "OUT_OF_MEMORY_ERROR":
+        case "LINTER_FAILED":
+            return "danger";
+        case "SUBMITTED":
+            return "secondary";
+        default:
+            return "dark";
     }
-}
+};
 
 const ProblemResultsPage: React.FC = () => {
+    const { id: taskId } = useParams<{ id: string }>();
     const location = useLocation();
-    const { state } = location;
-    const submissionIdToTrack: string | undefined = state?.submissionId;
-    const taskId = location.pathname.split("/")[3];
+    const submissionIdToTrack = (location.state as any)?.submissionId;
 
-
-    const [trackedSubmission, setTrackedSubmission] = useState<ISubmission | null>(
-        submissionIdToTrack ? {
-            id: submissionIdToTrack,
-            taskId, status: "SUBMITTED",
-            createdAt: new Date().toISOString()
-        } : null
-    );
-
+    const [submissions, setSubmissions] = useState<ISubmission[]>([]);
+    const [trackedSubmission, setTrackedSubmission] = useState<ISubmission | null>(null);
     const [showLogsModal, setShowLogsModal] = useState(false);
-    const handleCloseLogsModal = () => setShowLogsModal(false);
+    const [loading, setLoading] = useState(true);
+
     const handleShowLogsModal = (submission: ISubmission) => {
         setTrackedSubmission(submission);
         setShowLogsModal(true);
     };
 
+    const handleCloseLogsModal = () => setShowLogsModal(false);
+
+    useEffect(() => {
+        if (!taskId) return;
+
+        const load = async () => {
+            try {
+                const res = await fetch(`http://localhost:8000/api/submissions/${taskId}/history`, {
+                    credentials: "include"
+                });
+
+                const data: ISubmission[] = await res.json();
+
+                setSubmissions(
+                    data.sort(
+                        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                    )
+                );
+            } catch (e) {
+                console.error("History load error:", e);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        load();
+    }, [taskId]);
 
     useEffect(() => {
         if (!submissionIdToTrack) return;
-        const eventSource = new EventSource(`http://localhost:8000/api/tasks/status?submissionId=${submissionIdToTrack}`);
-        eventSource.onopen = () => console.log("SSE Connection opened.");
+
+        const eventSource = new EventSource(
+            `http://localhost:8000/api/tasks/status?submissionId=${submissionIdToTrack}`,
+            { withCredentials: true }
+        );
+
         eventSource.onmessage = (event) => {
             try {
-                const updatedSubmission: ISubmission = JSON.parse(event.data);
-                setTrackedSubmission(updatedSubmission);
-            } catch (err) {
-                console.error("Error parsing SSE data:", err);
+                const updated: ISubmission = JSON.parse(event.data);
+                setTrackedSubmission(updated);
+
+                setSubmissions((prev) => {
+                    const existing = prev.filter(s => s.id !== updated.id);
+                    return [updated, ...existing].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                });
+            } catch (e) {
+                console.error("SSE parse error:", e);
             }
         };
 
         eventSource.onerror = (err) => {
-            console.error("SSE Error:", err);
+            console.error("SSE error:", err);
             eventSource.close();
         };
 
-        return () => {
-            eventSource.close();
-            console.log("SSE Connection cleanup.");
-        };
+        return () => eventSource.close();
     }, [submissionIdToTrack]);
+
+    const taskIdText = taskId ?? "";
 
     return (
         <>
-            <Navbar/>
-            <Link to='/problemset' className="decoration-none text-2xl ml-60 mt-2 font-bold text-black no-underline">
+            <Navbar />
+
+            <Link
+                to='/problemset'
+                className="decoration-none text-2xl ml-60 mt-2 font-bold text-black no-underline"
+            >
                 CSES Problem Set
             </Link>
 
-            <TabsNavigation options={[
-                { value: 'tasks', path: '/problemset' },
-                { value: 'submit', path: `/problemset/submit/${taskId}` },
-                { value: 'result', path: `/problemset/results/${taskId}` },
-                { value: 'statistics', path: `/problemset/statistics/${taskId}` },
-            ]} />
+            <TabsNavigation
+                options={[
+                    { value: 'tasks', path: '/problemset' },
+                    { value: 'submit', path: `/problemset/submit/${taskIdText}` },
+                    { value: 'result', path: `/problemset/results/${taskIdText}` },
+                    { value: 'statistics', path: `/problemset/statistics/${taskIdText}` }
+                ]}
+            />
 
             <div className="max-w-4xl mx-auto p-6">
-                <h2 className="text-3xl font-semibold mb-4">Results for Task {taskId}</h2>
+                <h2 className="text-3xl font-semibold mb-4">Results for Task {taskIdText}</h2>
 
-                <Table striped bordered hover responsive>
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Status</th>
-                        <th>Submitted at</th>
-                        <th>Logs</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {trackedSubmission && (
-                        <tr style={{ cursor: 'pointer' }}>
-                            <td>{trackedSubmission.id}</td>
-                            <td><Badge bg={getBadgeVariant(trackedSubmission.status)}>{trackedSubmission.status}</Badge></td>
-                            <td>{new Date(trackedSubmission.createdAt).toLocaleTimeString()}</td>
-                            <td>{trackedSubmission.userId || "-"}</td>
-                            <td>
-                                <Button variant="dark" size="sm" onClick={() => handleShowLogsModal(trackedSubmission)}>
-                                    Show
-                                </Button>
-                            </td>
+                {loading ? (
+                    <div>Loading submissions...</div>
+                ) : (
+                    <Table striped bordered hover responsive>
+                        <thead>
+                        <tr>
+                            <th>Submission ID</th>
+                            <th>Status</th>
+                            <th>Score</th>
+                            <th>Logs</th>
                         </tr>
-                    )}
-                    </tbody>
-                </Table>
+                        </thead>
+                        <tbody>
+                        {submissions.map(sub => (
+                            <tr key={sub.id}>
+                                <td>{sub.id}</td>
+                                <td><Badge bg={getBadgeVariant(sub.status)}>{sub.status}</Badge></td>
+                                <td>{sub.score ?? "-"}</td>
+                                <td>
+                                    <Button variant="dark" size="sm" onClick={() => handleShowLogsModal(sub)}>
+                                        Show
+                                    </Button>
+                                </td>
+                            </tr>
+                        ))}
+                        {submissions.length === 0 && (
+                            <tr><td colSpan={4}>No submissions yet.</td></tr>
+                        )}
+                        </tbody>
+                    </Table>
+                )}
             </div>
 
             <Modal show={showLogsModal} onHide={handleCloseLogsModal} size="lg">
@@ -131,9 +160,9 @@ const ProblemResultsPage: React.FC = () => {
                     <Modal.Title>Execution Logs {trackedSubmission?.id}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <pre className="p-3 bg-light border rounded" style={{ maxHeight: '500px', overflow: 'auto' }}>
-                        {trackedSubmission?.logs || "No logs found."}
-                    </pre>
+          <pre className="p-3 bg-light border rounded" style={{ maxHeight: '500px', overflow: 'auto' }}>
+            {trackedSubmission?.logs || "No logs found."}
+          </pre>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="dark" onClick={handleCloseLogsModal}>Close</Button>

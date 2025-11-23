@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import TabsNavigation from "../components/ui/TabsNavigation.tsx";
-import type IProblem from "../types";
+import React, {useEffect, useState} from 'react';
 import ProblemsTable from "../components/problems/ProblemsTable.tsx";
+import type { IProblem } from "../types";
 import Navbar from "../components/ui/Navbar.tsx";
 
-const MainPage: React.FC = () => {
+const ProblemsetPage: React.FC = () => {
     const [problems, setProblems] = useState<IProblem[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -29,21 +28,16 @@ const MainPage: React.FC = () => {
         fetchProblems();
     }, []);
 
+    if (loading) {
+        return <div className="ml-60 mt-4">Loading problems...</div>;
+    }
+
     return (
-        <div>
+        <>
             <Navbar />
-            <div className="text-3xl ml-60 mt-6 font-bold">CSES Problem Set</div>
-            <TabsNavigation options={[
-                { value: 'tasks', path: '/problemset' },
-                { value: 'stats', path: '/stats' }
-            ]} />
-            {loading ? (
-                <div className="ml-60 mt-4">Loading problems...</div>
-            ) : (
-                <ProblemsTable problems={problems} />
-            )}
-        </div>
+            <ProblemsTable problems={problems}/>
+        </>
     );
 };
 
-export default MainPage;
+export default ProblemsetPage;
