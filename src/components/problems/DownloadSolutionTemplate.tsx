@@ -4,9 +4,10 @@ import { Button } from "react-bootstrap";
 
 interface TestsPageProps {
     solutionTemplateFileId?: string;
+    buttonName?: string;
 }
 
-export const DownloadSolutionTemplate: React.FC<TestsPageProps> = ({solutionTemplateFileId}) => {
+export const DownloadSolutionTemplate: React.FC<TestsPageProps> = ({solutionTemplateFileId, buttonName="Download solution template"}) => {
     const user = useAuthStore(state => state.user);
 
     const handleOnClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -37,9 +38,9 @@ export const DownloadSolutionTemplate: React.FC<TestsPageProps> = ({solutionTemp
     return (
         <>
             {user && (
-                <div className="ml-60">
-                    <Button onClick={handleOnClick} variant="dark" className="w-25">
-                        Download solution template
+                <div>
+                    <Button size="sm" onClick={handleOnClick} variant="dark">
+                        {buttonName}
                     </Button>
                 </div>
             )}

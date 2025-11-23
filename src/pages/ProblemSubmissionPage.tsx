@@ -7,7 +7,7 @@ import { SubmissionFileType } from "../types";
 import type { IProblem } from "../types";
 import FileUpload from "../components/files/FileUpload.tsx";
 import GitHubFileUpload from "../components/files/GitHubFileUpload.tsx";
-import {Button} from "react-bootstrap";
+import { Alert, Button } from "react-bootstrap";
 import {DownloadSolutionTemplate} from "../components/problems/DownloadSolutionTemplate.tsx";
 
 const ProblemSubmissionPage: React.FC = () => {
@@ -16,10 +16,14 @@ const ProblemSubmissionPage: React.FC = () => {
     const navigate = useNavigate();
     const taskId = id ?? "";
     const [task, setTask] = useState<IProblem | null>(null);
-
     const [mode, setMode] = useState<"FILE" | "REPO" | "TEMPLATE">("FILE");
     const [uploadedFileId, setUploadedFileId] = useState<string | null>(null);
 
+    const [alert, setAlert] = useState<string | null>(null);
+    const alertUser = (msg: string) => {
+        setAlert(msg);
+        setTimeout(() => setAlert(null), 2000);
+    };
 
     useEffect(() => {
         async function loadTask() {
@@ -34,7 +38,7 @@ const ProblemSubmissionPage: React.FC = () => {
 
     async function handleSubmitSolution() {
         if (!uploadedFileId) {
-            alert("Please upload file first");
+            alertUser("Please upload file first.");
             return;
         }
 
@@ -51,21 +55,35 @@ const ProblemSubmissionPage: React.FC = () => {
                 body
             });
 
-            if (!res.ok) throw new Error("Submission failed");
+            if (!res.ok) {
+                const problem = await res.json().catch(() => null);
+
+                if (res.status === 403 && problem?.title === "Submission Not Allowed") {
+                    alertUser(problem.detail);
+                    return;
+                }
+
+                alertUser("Submission error.");
+                return;
+            }
 
             const data = await res.json();
-            const submissionId = data.id;
+            navigate(`/problemset/results/${taskId}`, { state: { submissionId: data.id } });
 
-            navigate(`/problemset/results/${taskId}`, { state: { submissionId } });
-        } catch (err) {
-            console.error(err);
-            alert("Submission error");
+        } catch {
+            alertUser("Submission error.");
         }
     }
 
     return (
         <>
             <Navbar />
+
+            {alert && (
+                <Alert variant="danger" className="m-3">
+                    {alert}
+                </Alert>
+            )}
 
             <Link
                 to="/problemset"
@@ -109,6 +127,7 @@ const ProblemSubmissionPage: React.FC = () => {
                             />
                             Select repository
                         </label>
+
                         <label>
                             <input
                                 type="radio"
@@ -144,9 +163,11 @@ const ProblemSubmissionPage: React.FC = () => {
                         <GitHubFileUpload taskId={taskId} autoLoad={true} />
                     )}
 
-                    {mode === "TEMPLATE" && (
-                        <DownloadSolutionTemplate solutionTemplateFileId={task?.solutionTemplateFileId}/>
-                    )}
+                    <div className="ml-60">
+                        {mode === "TEMPLATE" && (
+                            <DownloadSolutionTemplate solutionTemplateFileId={task?.solutionTemplateFileId}/>
+                        )}
+                    </div>
                 </>
             )}
         </>

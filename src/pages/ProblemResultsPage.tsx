@@ -83,22 +83,25 @@ const ProblemResultsPage: React.FC = () => {
     useEffect(() => {
         if (!submissionIdToTrack) return;
 
-        const eventSource = new EventSource(
-            `http://localhost:8000/api/tasks/status?submissionId=${submissionIdToTrack}`,
-            { withCredentials: true }
-        );
+        const url = `http://localhost:8000/api/tasks/status?submissionId=${submissionIdToTrack}`;
+        const eventSource = new EventSource(url);
 
-        eventSource.onmessage = (event) => {
+        eventSource.onmessage = event => {
+            if (!event.data) return;
+
             try {
                 const updated: ISubmission = JSON.parse(event.data);
                 setTrackedSubmission(updated);
 
-                setSubmissions((prev) => {
-                    const existing = prev.filter(s => s.id !== updated.id);
-                    return [updated, ...existing].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                setSubmissions(prev => {
+                    const withoutOld = prev.filter(s => s.id !== updated.id);
+                    return [updated, ...withoutOld].sort(
+                        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                    );
                 });
-            } catch (e) {
-                console.error("SSE parse error:", e);
+
+            } catch (err) {
+                console.error("SSE parse error:", err);
             }
         };
 
@@ -133,7 +136,7 @@ const ProblemResultsPage: React.FC = () => {
             />
 
             <div className="max-w-4xl mx-auto p-6">
-                <h2 className="text-3xl font-semibold mb-4">Results for Task {taskIdText}</h2>
+                <h2 className="text-3xl font-semibold mb-4">Results for Task {task?.title}</h2>
 
                 {loading ? (
                     <div>Loading submissions...</div>
@@ -149,18 +152,23 @@ const ProblemResultsPage: React.FC = () => {
                         </tr>
                         </thead>
                         <tbody>
-                        {submissions.map(sub => (
-                            <tr key={sub.id}>
-                                <td>{sub.id}</td>
-                                <td><Badge bg={getBadgeVariant(sub.status)}>{sub.status}</Badge></td>
-                                <td>{sub.score ?? "-"}</td>
+                        {submissions.map(submission => (
+                            <tr key={submission.id}>
+                                <td>{submission.id}</td>
+                                <td><Badge bg={getBadgeVariant(submission.status)}>{submission.status}</Badge></td>
+                                <td>{submission.score ?? "-"}</td>
                                 <td>
-                                    <Button variant="dark" size="sm" onClick={() => handleShowLogsModal(sub)}>
+                                    <Button variant="dark" size="sm" onClick={() => handleShowLogsModal(submission)}>
                                         Show
                                     </Button>
                                 </td>
                                 <td>
-                                    <DownloadSolutionTemplate solutionTemplateFileId={task?.solutionTemplateFileId}/>
+                                    <div>
+                                        <DownloadSolutionTemplate
+                                            buttonName="Download"
+                                            solutionTemplateFileId={task?.solutionTemplateFileId}
+                                        />
+                                    </div>
                                 </td>
                             </tr>
                         ))}

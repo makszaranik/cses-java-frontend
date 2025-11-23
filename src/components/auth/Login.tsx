@@ -21,8 +21,7 @@ const Login = () => {
     }, []);
 
     const handleLogin = () => {
-        window.location.href =
-            "http://localhost:8000/api/oauth2/authorization/github";
+        window.location.href = "http://localhost:8000/api/oauth2/authorization/github";
     };
 
     return (
