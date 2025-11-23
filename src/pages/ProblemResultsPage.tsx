@@ -4,6 +4,8 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import TabsNavigation from "../components/ui/TabsNavigation.tsx";
 import { Table, Badge, Modal, Button } from "react-bootstrap";
 import type { ISubmission, SubmissionStatus } from "../types";
+import type { IProblem } from "../types";
+import {DownloadSolutionTemplate} from "../components/problems/DownloadSolutionTemplate.tsx";
 
 const getBadgeVariant = (status: SubmissionStatus): string => {
     switch (status) {
@@ -28,7 +30,7 @@ const ProblemResultsPage: React.FC = () => {
     const { id: taskId } = useParams<{ id: string }>();
     const location = useLocation();
     const submissionIdToTrack = (location.state as any)?.submissionId;
-
+    const [task, setTask] = useState<IProblem | null>(null);
     const [submissions, setSubmissions] = useState<ISubmission[]>([]);
     const [trackedSubmission, setTrackedSubmission] = useState<ISubmission | null>(null);
     const [showLogsModal, setShowLogsModal] = useState(false);
@@ -38,6 +40,17 @@ const ProblemResultsPage: React.FC = () => {
         setTrackedSubmission(submission);
         setShowLogsModal(true);
     };
+
+    useEffect(() => {
+        async function loadTask() {
+            const res = await fetch(`http://localhost:8000/api/tasks/${taskId}`, {
+                credentials: "include"
+            });
+            const data = await res.json();
+            setTask(data);
+        }
+        loadTask();
+    }, [taskId]);
 
     const handleCloseLogsModal = () => setShowLogsModal(false);
 
@@ -132,6 +145,7 @@ const ProblemResultsPage: React.FC = () => {
                             <th>Status</th>
                             <th>Score</th>
                             <th>Logs</th>
+                            <th>Solution</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -144,6 +158,9 @@ const ProblemResultsPage: React.FC = () => {
                                     <Button variant="dark" size="sm" onClick={() => handleShowLogsModal(sub)}>
                                         Show
                                     </Button>
+                                </td>
+                                <td>
+                                    <DownloadSolutionTemplate solutionTemplateFileId={task?.solutionTemplateFileId}/>
                                 </td>
                             </tr>
                         ))}
