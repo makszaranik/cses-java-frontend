@@ -46,6 +46,11 @@ const Navbar: React.FC = () => {
 
                     {isAdmin && (
                         <>
+                            <Link to="/teacher-panel" className="text-white hover:underline">
+                                Teacher Panel
+                            </Link>
+                            <span className="text-gray-400">|</span>
+
                             <Link to="/admin-panel" className="text-white hover:underline">
                                 Admin Panel
                             </Link>

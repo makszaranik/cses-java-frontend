@@ -28,10 +28,11 @@ export const publicRoutes: IRoute[] = [
     {path: RouteNames.MAIN, element: <MainPage/>},
     {path: RouteNames.PROBLEM_SET + '/task/:id', element: <ProblemPage/>},
     {path: RouteNames.PROBLEM_SET + '/submit/:id', element: <ProblemSubmissionPage/>},
-    {path: RouteNames.PROBLEM_SET + '/results/:id', element: <ProblemResultsPage/>},
-    {path: RouteNames.PROBLEM_SET + '/statistics/:id', element: <StatisticsPage/>},
-    {path: RouteNames.TEACHER_PANEL, element: <TeacherPanelPage/>},
-    {path: RouteNames.ADMIN_PANEL, element: <AdminPanelPage/>},
 ];
 
-export const privateRoutes: IRoute[] = []
+export const privateRoutes: IRoute[] = [
+    {path: RouteNames.PROBLEM_SET + '/results/:id', element: <ProblemResultsPage/>},
+    {path: RouteNames.TEACHER_PANEL, element: <TeacherPanelPage/>},
+    {path: RouteNames.ADMIN_PANEL, element: <AdminPanelPage/>},
+    {path: RouteNames.PROBLEM_SET + '/statistics/:id', element: <StatisticsPage/>},
+]
