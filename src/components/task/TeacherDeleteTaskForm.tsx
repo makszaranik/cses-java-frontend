@@ -10,7 +10,7 @@ const TeacherDeleteTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
     useEffect(() => {
         async function fetchTasks() {
             try {
-                const res = await fetch("http://localhost:8000/api/tasks", {
+                const res = await fetch("http://localhost:8000/api/tasks/owned", {
                     credentials: "include"
                 });
 

@@ -1,15 +1,15 @@
 import React from 'react';
 import logo from '../../assets/img.png';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../state";
 
 const Navbar: React.FC = () => {
     const user = useAuthStore(state => state.user);
     const setUser = useAuthStore(state => state.setUser);
+    const navigate = useNavigate();
 
-    const isTeacher =
-        user?.role?.toUpperCase() === "TEACHER" ||
-        user?.role?.toUpperCase() === "ADMIN";
+    const isTeacher = user?.role?.toUpperCase() === "TEACHER";
+    const isAdmin = user?.role?.toUpperCase() === "ADMIN";
 
     const handleLogout = async () => {
         try {
@@ -21,6 +21,7 @@ const Navbar: React.FC = () => {
             console.error("Logout error:", error);
         } finally {
             setUser(null);
+            navigate("/");
         }
     };
 
@@ -28,7 +29,6 @@ const Navbar: React.FC = () => {
         <div className="w-full bg-black shadow">
             <div className="flex justify-between items-center px-4 py-2">
 
-                {/* CLICKABLE LOGO */}
                 <Link to="/">
                     <img src={logo} alt="Logo" className="ml-52 h-8 cursor-pointer" />
                 </Link>
@@ -44,10 +44,20 @@ const Navbar: React.FC = () => {
                         </>
                     )}
 
+                    {isAdmin && (
+                        <>
+                            <Link to="/admin-panel" className="text-white hover:underline">
+                                Admin Panel
+                            </Link>
+                            <span className="text-gray-400">|</span>
+                        </>
+                    )}
+
                     {user ? (
                         <>
                             <span className="text-white">{user.username}</span>
                             <span className="text-gray-400">|</span>
+
                             <button
                                 type="button"
                                 onClick={handleLogout}
@@ -57,7 +67,9 @@ const Navbar: React.FC = () => {
                             </button>
                         </>
                     ) : (
-                        <Link to="/login" className="text-white hover:underline">Login</Link>
+                        <Link to="/login" className="text-white hover:underline">
+                            Login
+                        </Link>
                     )}
                 </div>
             </div>

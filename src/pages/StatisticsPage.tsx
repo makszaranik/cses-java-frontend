@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/ui/Navbar.tsx";
 import { Link, useParams } from "react-router-dom";
-import TabsNavigation from "../components/TabsNavigation.tsx";
+import TabsNavigation from "../components/ui/TabsNavigation.tsx";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 

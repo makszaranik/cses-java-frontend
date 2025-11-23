@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Problem from "../components/problems/Problem.tsx";
 import Navbar from "../components/ui/Navbar.tsx";
-import type IProblem from "../types";
-import TabsNavigation from "../components/TabsNavigation.tsx";
-import { Link, useParams } from "react-router-dom";
-import { DownloadSolutionTemplate } from "../components/problems/DownloadSolutionTemplate.tsx";
+import type {IProblem} from "../types";
+import TabsNavigation from "../components/ui/TabsNavigation.tsx";
+import {Link, useParams} from "react-router-dom";
 
 const ProblemPage: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    const {id} = useParams<{ id: string }>();
     const [problem, setProblem] = useState<IProblem | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -41,7 +40,7 @@ const ProblemPage: React.FC = () => {
 
     return (
         <>
-            <Navbar />
+            <Navbar/>
 
             <Link
                 to='/problemset'
@@ -52,10 +51,10 @@ const ProblemPage: React.FC = () => {
 
             <TabsNavigation
                 options={[
-                    { value: 'tasks', path: '/problemset' },
-                    { value: 'submit', path: `/problemset/submit/${problem.id}` },
-                    { value: 'result', path: `/problemset/results/${problem.id}` },
-                    { value: 'statistics', path: `/problemset/statistics/${problem.id}` }
+                    {value: 'tasks', path: '/problemset'},
+                    {value: 'submit', path: `/problemset/submit/${problem.id}`},
+                    {value: 'result', path: `/problemset/results/${problem.id}`},
+                    {value: 'statistics', path: `/problemset/statistics/${problem.id}`}
                 ]}
             />
 
@@ -67,12 +66,6 @@ const ProblemPage: React.FC = () => {
                     memoryRestriction={problem.memoryRestriction}
                     submissionsNumberLimit={problem.submissionsNumberLimit}
                 />
-
-                {problem.solutionTemplateFileId && (
-                    <div className="mt-4">
-                        <DownloadSolutionTemplate solutionTemplateFileId={problem.solutionTemplateFileId} />
-                    </div>
-                )}
             </div>
         </>
     );

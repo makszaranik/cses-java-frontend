@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import TabsNavigation from "../components/TabsNavigation.tsx";
+import TabsNavigation from "../components/ui/TabsNavigation.tsx";
 import type IProblem from "../types";
 import ProblemsTable from "../components/problems/ProblemsTable.tsx";
 import Navbar from "../components/ui/Navbar.tsx";

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from "../components/ui/Navbar.tsx";
 import { Link, useLocation, useParams } from "react-router-dom";
-import TabsNavigation from "../components/TabsNavigation.tsx";
+import TabsNavigation from "../components/ui/TabsNavigation.tsx";
 import { Table, Badge, Modal, Button } from "react-bootstrap";
 import type { ISubmission, SubmissionStatus } from "../types";
 
@@ -14,6 +14,7 @@ const getBadgeVariant = (status: SubmissionStatus): string => {
         case "COMPILATION_ERROR":
         case "WRONG_ANSWER":
         case "TIME_LIMIT_EXCEEDED":
+        case "OUT_OF_MEMORY_ERROR":
         case "LINTER_FAILED":
             return "danger";
         case "SUBMITTED":
@@ -69,36 +70,31 @@ const ProblemResultsPage: React.FC = () => {
     useEffect(() => {
         if (!submissionIdToTrack) return;
 
-        const es = new EventSource(
+        const eventSource = new EventSource(
             `http://localhost:8000/api/tasks/status?submissionId=${submissionIdToTrack}`,
             { withCredentials: true }
         );
 
-        es.onmessage = (event) => {
+        eventSource.onmessage = (event) => {
             try {
                 const updated: ISubmission = JSON.parse(event.data);
                 setTrackedSubmission(updated);
 
                 setSubmissions((prev) => {
                     const existing = prev.filter(s => s.id !== updated.id);
-                    return [
-                        updated,
-                        ...existing
-                    ].sort(
-                        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-                    );
+                    return [updated, ...existing].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
                 });
             } catch (e) {
                 console.error("SSE parse error:", e);
             }
         };
 
-        es.onerror = (err) => {
+        eventSource.onerror = (err) => {
             console.error("SSE error:", err);
-            es.close();
+            eventSource.close();
         };
 
-        return () => es.close();
+        return () => eventSource.close();
     }, [submissionIdToTrack]);
 
     const taskIdText = taskId ?? "";

@@ -3,7 +3,7 @@ import ProblemsTable from "../components/problems/ProblemsTable.tsx";
 import type { IProblem } from "../types";
 import Navbar from "../components/ui/Navbar.tsx";
 
-const ProblemSetPage: React.FC = () => {
+const ProblemsetPage: React.FC = () => {
     const [problems, setProblems] = useState<IProblem[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -40,4 +40,4 @@ const ProblemSetPage: React.FC = () => {
     );
 };
 
-export default ProblemSetPage;
+export default ProblemsetPage;

@@ -1,21 +1,36 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Navbar from "../components/ui/Navbar.tsx";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import TabsNavigation from "../components/TabsNavigation.tsx";
+import TabsNavigation from "../components/ui/TabsNavigation.tsx";
 import { useAuthStore } from "../state";
 import { SubmissionFileType } from "../types";
+import type { IProblem } from "../types";
 import FileUpload from "../components/files/FileUpload.tsx";
 import GitHubFileUpload from "../components/files/GitHubFileUpload.tsx";
 import {Button} from "react-bootstrap";
+import {DownloadSolutionTemplate} from "../components/problems/DownloadSolutionTemplate.tsx";
 
 const ProblemSubmissionPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const user = useAuthStore(state => state.user);
     const navigate = useNavigate();
     const taskId = id ?? "";
+    const [task, setTask] = useState<IProblem | null>(null);
 
-    const [mode, setMode] = useState<"FILE" | "REPO">("FILE");
+    const [mode, setMode] = useState<"FILE" | "REPO" | "TEMPLATE">("FILE");
     const [uploadedFileId, setUploadedFileId] = useState<string | null>(null);
+
+
+    useEffect(() => {
+        async function loadTask() {
+            const res = await fetch(`http://localhost:8000/api/tasks/${taskId}`, {
+                credentials: "include"
+            });
+            const data = await res.json();
+            setTask(data);
+        }
+        loadTask();
+    }, [taskId]);
 
     async function handleSubmitSolution() {
         if (!uploadedFileId) {
@@ -85,7 +100,7 @@ const ProblemSubmissionPage: React.FC = () => {
                             Upload file
                         </label>
 
-                        <label>
+                        <label className="mr-4">
                             <input
                                 type="radio"
                                 className="mr-1"
@@ -93,6 +108,15 @@ const ProblemSubmissionPage: React.FC = () => {
                                 onChange={() => setMode("REPO")}
                             />
                             Select repository
+                        </label>
+                        <label>
+                            <input
+                                type="radio"
+                                className="mr-1"
+                                checked={mode === "TEMPLATE"}
+                                onChange={() => setMode("TEMPLATE")}
+                            />
+                            Download solution template
                         </label>
                     </div>
 
@@ -116,9 +140,12 @@ const ProblemSubmissionPage: React.FC = () => {
                         </div>
                     )}
 
-
                     {mode === "REPO" && (
                         <GitHubFileUpload taskId={taskId} autoLoad={true} />
+                    )}
+
+                    {mode === "TEMPLATE" && (
+                        <DownloadSolutionTemplate solutionTemplateFileId={task?.solutionTemplateFileId}/>
                     )}
                 </>
             )}

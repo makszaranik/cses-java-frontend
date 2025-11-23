@@ -6,7 +6,7 @@ interface TestsPageProps {
     solutionTemplateFileId?: string;
 }
 
-export const DownloadSolutionTemplate: React.FC<TestsPageProps> = ({ solutionTemplateFileId }) => {
+export const DownloadSolutionTemplate: React.FC<TestsPageProps> = ({solutionTemplateFileId}) => {
     const user = useAuthStore(state => state.user);
 
     const handleOnClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -37,8 +37,8 @@ export const DownloadSolutionTemplate: React.FC<TestsPageProps> = ({ solutionTem
     return (
         <>
             {user && (
-                <div>
-                    <Button onClick={handleOnClick} variant="dark" style={{ width: "100%" }}>
+                <div className="ml-60">
+                    <Button onClick={handleOnClick} variant="dark" className="w-25">
                         Download solution template
                     </Button>
                 </div>

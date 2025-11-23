@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Button } from "react-bootstrap";
-import { useAuthStore } from "../state";
+import { useAuthStore } from "../../state";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {

@@ -5,38 +5,58 @@ import { SubmissionFileType } from "../../types";
 
 const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
     const [tasks, setTasks] = useState<any[]>([]);
-    const [taskId, setTaskId] = useState("");
     const [original, setOriginal] = useState<any>(null);
 
     const [form, setForm] = useState({
         taskId: "",
         title: "",
         statement: "",
-        memoryRestriction: 1,
+        memoryRestriction: 0,
         solutionTemplateFileId: "",
         testsFileId: "",
         lintersFileId: "",
         testsPoints: 0,
         lintersPoints: 0,
-        submissionsNumberLimit: 1
+        submissionsNumberLimit: 0
     });
 
-    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [errors, setErrors] = useState<any>({});
     const [loading, setLoading] = useState(false);
 
     const setField = (name: string, value: any) => {
         setForm(prev => ({ ...prev, [name]: value }));
-        if (errors[name]) setErrors(prev => ({ ...prev, [name]: "" }));
+    };
+
+    const validate = () => {
+        const e: any = {};
+
+        if (!form.title.trim()) e.title = "Required";
+        if (!form.statement.trim()) e.statement = "Required";
+
+        if (form.memoryRestriction < 6 || form.memoryRestriction > 512)
+            e.memoryRestriction = "6–512";
+
+        if (form.testsPoints < 0 || form.testsPoints > 100)
+            e.testsPoints = "0–100";
+
+        if (form.lintersPoints < 0 || form.lintersPoints > 100)
+            e.lintersPoints = "0–100";
+
+        if (form.submissionsNumberLimit < 1)
+            e.submissionsNumberLimit = "Must be ≥ 1";
+
+        setErrors(e);
+        return Object.keys(e).length === 0;
     };
 
     useEffect(() => {
-        fetch("http://localhost:8000/api/tasks", { credentials: "include" })
+        fetch("http://localhost:8000/api/tasks/owned", { credentials: "include" })
             .then(r => r.json())
             .then(setTasks)
             .catch(() => alert("Error loading tasks"));
     }, []);
 
-    async function loadTask(id: string) {
+    const load = async (id: string) => {
         try {
             const r = await fetch(`http://localhost:8000/api/tasks/${id}`, {
                 credentials: "include"
@@ -49,61 +69,27 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                 title: data.title,
                 statement: data.statement,
                 memoryRestriction: data.memoryRestriction,
-                solutionTemplateFileId: data.solutionTemplateFileId,
-                testsFileId: data.testsFileId,
-                lintersFileId: data.lintersFileId,
+                solutionTemplateFileId: "",
+                testsFileId: "",
+                lintersFileId: "",
                 testsPoints: data.testsPoints,
                 lintersPoints: data.lintersPoints,
                 submissionsNumberLimit: data.submissionsNumberLimit
             });
 
-            setErrors({});
         } catch {
             alert("Error loading task");
         }
-    }
-
-    function validate() {
-        const e: any = {};
-        const f = form;
-
-        if (!f.title.trim()) e.title = "Required";
-        if (!f.statement.trim()) e.statement = "Required";
-
-        if (f.memoryRestriction < 0 || f.memoryRestriction > 512)
-            e.memoryRestriction = "0–512";
-
-        if (f.testsPoints < 0 || f.testsPoints > 100)
-            e.testsPoints = "0–100";
-
-        if (f.lintersPoints < 0 || f.lintersPoints > 100)
-            e.lintersPoints = "0–100";
-
-        if (f.testsPoints + f.lintersPoints !== 100) {
-            e.testsPoints = "Sum must be 100";
-            e.lintersPoints = "Sum must be 100";
-        }
-
-        if (f.submissionsNumberLimit < 1)
-            e.submissionsNumberLimit = "Must be ≥ 1";
-
-        setErrors(e);
-        return Object.keys(e).length === 0;
-    }
+    };
 
     async function handleSubmit() {
-        if (!taskId) return;
-
         if (!validate()) return;
 
         const payload = {
             ...form,
-            solutionTemplateFileId:
-                form.solutionTemplateFileId || original?.solutionTemplateFileId,
-            testsFileId:
-                form.testsFileId || original?.testsFileId,
-            lintersFileId:
-                form.lintersFileId || original?.lintersFileId
+            solutionTemplateFileId: form.solutionTemplateFileId || original.solutionTemplateFileId,
+            testsFileId: form.testsFileId || original.testsFileId,
+            lintersFileId: form.lintersFileId || original.lintersFileId
         };
 
         setLoading(true);
@@ -120,7 +106,7 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
 
             onSuccess();
         } catch {
-            alert("Error updating task");
+            alert("Error updating");
         } finally {
             setLoading(false);
         }
@@ -133,18 +119,11 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
             <Form>
                 <Form.Group className="mt-2">
                     <Form.Label>Select Task</Form.Label>
-                    <Form.Select
-                        value={taskId}
-                        onChange={e => {
-                            const id = e.target.value;
-                            setTaskId(id);
-                            if (id) loadTask(id);
-                        }}
-                    >
-                        <option value="">-- Select task --</option>
-                        {tasks.map(t => (
-                            <option key={t.id} value={t.id}>
-                                {t.id} — {t.title}
+                    <Form.Select onChange={event => load(event.target.value)}>
+                        <option value="">-- select task --</option>
+                        {tasks.map(task => (
+                            <option key={task.id} value={task.id}>
+                                {task.id} — {task.title}
                             </option>
                         ))}
                     </Form.Select>
@@ -155,12 +134,10 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                     <Form.Control
                         name="title"
                         value={form.title}
-                        onChange={e => setField("title", e.target.value)}
                         isInvalid={!!errors.title}
+                        onChange={e => setField("title", e.target.value)}
                     />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.title}
-                    </Form.Control.Feedback>
+                    <Form.Control.Feedback type="invalid">{errors.title}</Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mt-2">
@@ -170,12 +147,10 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                         rows={3}
                         name="statement"
                         value={form.statement}
-                        onChange={e => setField("statement", e.target.value)}
                         isInvalid={!!errors.statement}
+                        onChange={e => setField("statement", e.target.value)}
                     />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.statement}
-                    </Form.Control.Feedback>
+                    <Form.Control.Feedback type="invalid">{errors.statement}</Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mt-2">
@@ -184,14 +159,10 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                         type="number"
                         name="memoryRestriction"
                         value={form.memoryRestriction}
-                        onChange={e => setField("memoryRestriction", Number(e.target.value))}
                         isInvalid={!!errors.memoryRestriction}
-                        min={0}
-                        max={512}
+                        onChange={e => setField("memoryRestriction", Number(e.target.value))}
                     />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.memoryRestriction}
-                    </Form.Control.Feedback>
+                    <Form.Control.Feedback type="invalid">{errors.memoryRestriction}</Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mt-2">
@@ -200,14 +171,10 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                         type="number"
                         name="testsPoints"
                         value={form.testsPoints}
-                        onChange={e => setField("testsPoints", Number(e.target.value))}
                         isInvalid={!!errors.testsPoints}
-                        min={0}
-                        max={100}
+                        onChange={e => setField("testsPoints", Number(e.target.value))}
                     />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.testsPoints}
-                    </Form.Control.Feedback>
+                    <Form.Control.Feedback type="invalid">{errors.testsPoints}</Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mt-2">
@@ -216,14 +183,10 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                         type="number"
                         name="lintersPoints"
                         value={form.lintersPoints}
-                        onChange={e => setField("lintersPoints", Number(e.target.value))}
                         isInvalid={!!errors.lintersPoints}
-                        min={0}
-                        max={100}
+                        onChange={e => setField("lintersPoints", Number(e.target.value))}
                     />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.lintersPoints}
-                    </Form.Control.Feedback>
+                    <Form.Control.Feedback type="invalid">{errors.lintersPoints}</Form.Control.Feedback>
                 </Form.Group>
 
                 <Form.Group className="mt-2">
@@ -232,20 +195,17 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                         type="number"
                         name="submissionsNumberLimit"
                         value={form.submissionsNumberLimit}
-                        onChange={e => setField("submissionsNumberLimit", Number(e.target.value))}
                         isInvalid={!!errors.submissionsNumberLimit}
-                        min={1}
+                        onChange={e => setField("submissionsNumberLimit", Number(e.target.value))}
                     />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.submissionsNumberLimit}
-                    </Form.Control.Feedback>
+                    <Form.Control.Feedback type="invalid">{errors.submissionsNumberLimit}</Form.Control.Feedback>
                 </Form.Group>
 
                 <h6 className="mt-3">Replace files (optional)</h6>
 
                 <FileUpload
-                    fileType={SubmissionFileType.SOLUTION}
-                    buttonText="Replace solution"
+                    fileType={SubmissionFileType.SOLUTION_TEMPLATE}
+                    buttonText="Replace solution template"
                     onFileUploaded={id => setField("solutionTemplateFileId", id)}
                 />
 
@@ -266,6 +226,7 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                         {loading ? "Updating..." : "Update Task"}
                     </Button>
                 </div>
+
             </Form>
         </div>
     );

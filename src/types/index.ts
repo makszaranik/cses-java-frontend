@@ -33,7 +33,7 @@ export type SubmissionStatus =
     "WRONG_ANSWER" |
     "ACCEPTED" |
     "TIME_LIMIT_EXCEEDED" |
-    "OUT_OF_MEMORY";
+    "OUT_OF_MEMORY_ERROR";
 
 export enum SubmissionFileType {
     SOLUTION = "SOLUTION",
