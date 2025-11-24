@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Navbar from "../components/ui/Navbar.tsx";
-import { Link, useLocation, useParams } from "react-router-dom";
+import {Link, useLocation, useParams} from "react-router-dom";
 import TabsNavigation from "../components/ui/TabsNavigation.tsx";
-import { Table, Badge, Modal, Button } from "react-bootstrap";
-import type { ISubmission, SubmissionStatus } from "../types";
-import type { IProblem } from "../types";
+import {Table, Badge, Modal, Button} from "react-bootstrap";
+import type {ISubmission, SubmissionStatus} from "../types";
+import type {IProblem} from "../types";
 import {DownloadFileById} from "../components/problems/DownloadFileById.tsx";
+
 const host = import.meta.env.VITE_BACKEND_URL;
 
 const getBadgeVariant = (status: SubmissionStatus): string => {
@@ -28,9 +29,10 @@ const getBadgeVariant = (status: SubmissionStatus): string => {
 };
 
 const ProblemResultsPage: React.FC = () => {
-    const { id: taskId } = useParams<{ id: string }>();
+    const {id: taskId} = useParams<{ id: string }>();
     const location = useLocation();
     const submissionIdToTrack = (location.state as any)?.submissionId;
+
     const [task, setTask] = useState<IProblem | null>(null);
     const [submissions, setSubmissions] = useState<ISubmission[]>([]);
     const [trackedSubmission, setTrackedSubmission] = useState<ISubmission | null>(null);
@@ -44,12 +46,11 @@ const ProblemResultsPage: React.FC = () => {
 
     useEffect(() => {
         async function loadTask() {
-            const res = await fetch(`${host}/api/tasks/${taskId}`, {
-                credentials: "include"
-            });
+            const res = await fetch(`${host}/api/tasks/${taskId}`, {credentials: "include"});
             const data = await res.json();
             setTask(data);
         }
+
         loadTask();
     }, [taskId]);
 
@@ -106,7 +107,7 @@ const ProblemResultsPage: React.FC = () => {
             }
         };
 
-        eventSource.onerror = (err) => {
+        eventSource.onerror = err => {
             console.error("SSE error:", err);
             eventSource.close();
         };
@@ -115,11 +116,10 @@ const ProblemResultsPage: React.FC = () => {
     }, [submissionIdToTrack]);
 
     const taskIdText = taskId ?? "";
-    console.log(submissions);
 
     return (
         <>
-            <Navbar />
+            <Navbar/>
 
             <Link
                 to='/problemset'
@@ -130,10 +130,10 @@ const ProblemResultsPage: React.FC = () => {
 
             <TabsNavigation
                 options={[
-                    { value: 'tasks', path: '/problemset' },
-                    { value: 'submit', path: `/problemset/submit/${taskIdText}` },
-                    { value: 'result', path: `/problemset/results/${taskIdText}` },
-                    { value: 'statistics', path: `/problemset/statistics/${taskIdText}` }
+                    {value: 'tasks', path: '/problemset'},
+                    {value: 'submit', path: `/problemset/submit/${taskIdText}`},
+                    {value: 'result', path: `/problemset/results/${taskIdText}`},
+                    {value: 'statistics', path: `/problemset/statistics/${taskIdText}`}
                 ]}
             />
 
@@ -153,6 +153,7 @@ const ProblemResultsPage: React.FC = () => {
                             <th>Solution</th>
                         </tr>
                         </thead>
+
                         <tbody>
                         {submissions.map(submission => (
                             <tr key={submission.id}>
@@ -165,17 +166,18 @@ const ProblemResultsPage: React.FC = () => {
                                     </Button>
                                 </td>
                                 <td>
-                                    <div>
-                                        <DownloadFileById
-                                            buttonName="Download"
-                                            fileId={submission.sourceCodeFileId}
-                                        />
-                                    </div>
+                                    <DownloadFileById
+                                        buttonName="Download"
+                                        fileId={submission.sourceCodeFileId}
+                                    />
                                 </td>
                             </tr>
                         ))}
+
                         {submissions.length === 0 && (
-                            <tr><td colSpan={4}>No submissions yet.</td></tr>
+                            <tr>
+                                <td colSpan={4}>No submissions yet.</td>
+                            </tr>
                         )}
                         </tbody>
                     </Table>
@@ -186,11 +188,30 @@ const ProblemResultsPage: React.FC = () => {
                 <Modal.Header closeButton>
                     <Modal.Title>Execution Logs {trackedSubmission?.id}</Modal.Title>
                 </Modal.Header>
+
                 <Modal.Body>
-          <pre className="p-3 bg-light border rounded" style={{ maxHeight: '500px', overflow: 'auto' }}>
-            {trackedSubmission?.logs || "No logs found."}
-          </pre>
+                    {trackedSubmission?.logs ? (
+                        <div
+                            className="p-3 bg-light border rounded"
+                            style={{maxHeight: '500px', overflow: 'auto', whiteSpace: 'pre-wrap'}}
+                        >
+                            {["BUILD", "LINTER", "TEST"]
+                                .filter(stage => trackedSubmission.logs[stage])
+                                .map(stage => (
+                                    <div key={stage} className="mb-4">
+                                        <h5 className="fw-bold text-uppercase">{stage}</h5>
+                                        <pre
+                                            className="bg-white p-2 border rounded">{trackedSubmission.logs[stage]}</pre>
+                                        <hr/>
+                                    </div>
+                                ))}
+                        </div>
+                    ) : (
+                        <pre className="p-3 bg-light border rounded">No logs found.</pre>
+                    )}
                 </Modal.Body>
+
+
                 <Modal.Footer>
                     <Button variant="dark" onClick={handleCloseLogsModal}>Close</Button>
                 </Modal.Footer>

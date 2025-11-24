@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import Navbar from "../components/ui/Navbar.tsx";
-import { Link, useParams } from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import TabsNavigation from "../components/ui/TabsNavigation.tsx";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { Pie } from "react-chartjs-2";
+import {Chart as ChartJS, ArcElement, Tooltip, Legend} from "chart.js";
+import {Pie} from "react-chartjs-2";
 import type {IProblem} from "../types";
+
 const host = import.meta.env.VITE_BACKEND_URL;
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const StatisticsPage: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    const {id} = useParams<{ id: string }>();
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [task, setTask] = useState<IProblem | null>(null);
@@ -22,6 +23,7 @@ const StatisticsPage: React.FC = () => {
             const data = await res.json();
             setTask(data);
         }
+
         loadTask();
     }, [id]);
 
@@ -32,7 +34,7 @@ const StatisticsPage: React.FC = () => {
             try {
                 const res = await fetch(
                     `${host}/api/users/statistics/${id}`,
-                    { credentials: "include" }
+                    {credentials: "include"}
                 );
 
                 if (!res.ok) throw new Error("Statistics fetch error");
@@ -87,7 +89,7 @@ const StatisticsPage: React.FC = () => {
 
     return (
         <>
-            <Navbar />
+            <Navbar/>
 
             <Link
                 to='/problemset'
@@ -98,10 +100,10 @@ const StatisticsPage: React.FC = () => {
 
             <TabsNavigation
                 options={[
-                    { value: "tasks", path: "/problemset" },
-                    { value: "submit", path: `/problemset/submit/${id}` },
-                    { value: "result", path: `/problemset/results/${id}` },
-                    { value: "statistics", path: `/problemset/statistics/${id}` }
+                    {value: "tasks", path: "/problemset"},
+                    {value: "submit", path: `/problemset/submit/${id}`},
+                    {value: "result", path: `/problemset/results/${id}`},
+                    {value: "statistics", path: `/problemset/statistics/${id}`}
                 ]}
             />
 
@@ -110,7 +112,7 @@ const StatisticsPage: React.FC = () => {
 
                 {loading && <div>Loading statistics...</div>}
                 {!loading && !data && <div>No statistics available.</div>}
-                {pieData && <Pie data={pieData} options={{ radius: "60%" }} />}
+                {pieData && <Pie data={pieData} options={{radius: "60%"}}/>}
             </div>
         </>
     );

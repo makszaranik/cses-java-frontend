@@ -63,7 +63,7 @@ const GitHubFileUpload: React.FC<GitHubFileUploadProps> = ({taskId, autoLoad = f
 
         try {
             const zipResp = await fetch(
-                `${host}/files/github-save-zip/${selected}`,
+                `${host}/api/files/github-save-zip/${selected}`,
                 { method: "GET", credentials: "include" }
             );
 
@@ -81,7 +81,7 @@ const GitHubFileUpload: React.FC<GitHubFileUploadProps> = ({taskId, autoLoad = f
             const zipFile = await zipResp.json();
             const fileId = zipFile.id;
 
-            const submitResp = await fetch(`${host}/tasks/submit`, {
+            const submitResp = await fetch(`${host}/api/tasks/submit`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

@@ -1,18 +1,19 @@
 import React, {useEffect, useState} from 'react';
 import Navbar from "../components/ui/Navbar.tsx";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import {Link, useParams, useNavigate} from "react-router-dom";
 import TabsNavigation from "../components/ui/TabsNavigation.tsx";
-import { useAuthStore } from "../state";
-import { SubmissionFileType } from "../types";
-import type { IProblem } from "../types";
+import {useAuthStore} from "../state";
+import {SubmissionFileType} from "../types";
+import type {IProblem} from "../types";
 import FileUpload from "../components/files/FileUpload.tsx";
 import GitHubFileUpload from "../components/files/GitHubFileUpload.tsx";
-import { Alert, Button } from "react-bootstrap";
+import {Alert, Button} from "react-bootstrap";
 import {DownloadFileById} from "../components/problems/DownloadFileById.tsx";
+
 const host = import.meta.env.VITE_BACKEND_URL;
 
 const ProblemSubmissionPage: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    const {id} = useParams<{ id: string }>();
     const user = useAuthStore(state => state.user);
     const navigate = useNavigate();
     const taskId = id ?? "";
@@ -34,6 +35,7 @@ const ProblemSubmissionPage: React.FC = () => {
             const data = await res.json();
             setTask(data);
         }
+
         loadTask();
     }, [taskId]);
 
@@ -51,7 +53,7 @@ const ProblemSubmissionPage: React.FC = () => {
 
             const res = await fetch(`${host}/api/tasks/submit`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {"Content-Type": "application/json"},
                 credentials: "include",
                 body
             });
@@ -69,7 +71,7 @@ const ProblemSubmissionPage: React.FC = () => {
             }
 
             const data = await res.json();
-            navigate(`/problemset/results/${taskId}`, { state: { submissionId: data.id } });
+            navigate(`/problemset/results/${taskId}`, {state: {submissionId: data.id}});
 
         } catch {
             alertUser("Submission error.");
@@ -78,7 +80,7 @@ const ProblemSubmissionPage: React.FC = () => {
 
     return (
         <>
-            <Navbar />
+            <Navbar/>
 
             {alert && (
                 <Alert variant="danger" className="m-3">
@@ -95,10 +97,10 @@ const ProblemSubmissionPage: React.FC = () => {
 
             <TabsNavigation
                 options={[
-                    { value: 'tasks', path: '/problemset' },
-                    { value: 'submit', path: `/problemset/submit/${taskId}` },
-                    { value: 'result', path: `/problemset/results/${taskId}` },
-                    { value: 'statistics', path: `/problemset/statistics/${taskId}` }
+                    {value: 'tasks', path: '/problemset'},
+                    {value: 'submit', path: `/problemset/submit/${taskId}`},
+                    {value: 'result', path: `/problemset/results/${taskId}`},
+                    {value: 'statistics', path: `/problemset/statistics/${taskId}`}
                 ]}
             />
 
@@ -161,7 +163,7 @@ const ProblemSubmissionPage: React.FC = () => {
                     )}
 
                     {mode === "REPO" && (
-                        <GitHubFileUpload taskId={taskId} autoLoad={true} />
+                        <GitHubFileUpload taskId={taskId} autoLoad={true}/>
                     )}
 
                     <div className="ml-60">
