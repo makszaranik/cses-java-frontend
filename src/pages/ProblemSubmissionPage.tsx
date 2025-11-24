@@ -8,7 +8,8 @@ import type { IProblem } from "../types";
 import FileUpload from "../components/files/FileUpload.tsx";
 import GitHubFileUpload from "../components/files/GitHubFileUpload.tsx";
 import { Alert, Button } from "react-bootstrap";
-import {DownloadSolutionTemplate} from "../components/problems/DownloadSolutionTemplate.tsx";
+import {DownloadFileById} from "../components/problems/DownloadFileById.tsx";
+const host = import.meta.env.VITE_BACKEND_URL;
 
 const ProblemSubmissionPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -27,7 +28,7 @@ const ProblemSubmissionPage: React.FC = () => {
 
     useEffect(() => {
         async function loadTask() {
-            const res = await fetch(`http://localhost:8000/api/tasks/${taskId}`, {
+            const res = await fetch(`${host}/api/tasks/${taskId}`, {
                 credentials: "include"
             });
             const data = await res.json();
@@ -48,7 +49,7 @@ const ProblemSubmissionPage: React.FC = () => {
                 sourceCodeFileId: uploadedFileId
             });
 
-            const res = await fetch("http://localhost:8000/api/tasks/submit", {
+            const res = await fetch(`${host}/api/tasks/submit`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",
@@ -165,7 +166,7 @@ const ProblemSubmissionPage: React.FC = () => {
 
                     <div className="ml-60">
                         {mode === "TEMPLATE" && (
-                            <DownloadSolutionTemplate solutionTemplateFileId={task?.solutionTemplateFileId}/>
+                            <DownloadFileById fileId={task?.solutionTemplateFileId}/>
                         )}
                     </div>
                 </>

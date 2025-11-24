@@ -5,7 +5,8 @@ import TabsNavigation from "../components/ui/TabsNavigation.tsx";
 import { Table, Badge, Modal, Button } from "react-bootstrap";
 import type { ISubmission, SubmissionStatus } from "../types";
 import type { IProblem } from "../types";
-import {DownloadSolutionTemplate} from "../components/problems/DownloadSolutionTemplate.tsx";
+import {DownloadFileById} from "../components/problems/DownloadFileById.tsx";
+const host = import.meta.env.VITE_BACKEND_URL;
 
 const getBadgeVariant = (status: SubmissionStatus): string => {
     switch (status) {
@@ -43,7 +44,7 @@ const ProblemResultsPage: React.FC = () => {
 
     useEffect(() => {
         async function loadTask() {
-            const res = await fetch(`http://localhost:8000/api/tasks/${taskId}`, {
+            const res = await fetch(`${host}/api/tasks/${taskId}`, {
                 credentials: "include"
             });
             const data = await res.json();
@@ -59,7 +60,7 @@ const ProblemResultsPage: React.FC = () => {
 
         const load = async () => {
             try {
-                const res = await fetch(`http://localhost:8000/api/submissions/${taskId}/history`, {
+                const res = await fetch(`${host}/api/submissions/${taskId}/history`, {
                     credentials: "include"
                 });
 
@@ -83,7 +84,7 @@ const ProblemResultsPage: React.FC = () => {
     useEffect(() => {
         if (!submissionIdToTrack) return;
 
-        const url = `http://localhost:8000/api/tasks/status?submissionId=${submissionIdToTrack}`;
+        const url = `${host}/api/tasks/status?submissionId=${submissionIdToTrack}`;
         const eventSource = new EventSource(url);
 
         eventSource.onmessage = event => {
@@ -114,6 +115,7 @@ const ProblemResultsPage: React.FC = () => {
     }, [submissionIdToTrack]);
 
     const taskIdText = taskId ?? "";
+    console.log(submissions);
 
     return (
         <>
@@ -164,9 +166,9 @@ const ProblemResultsPage: React.FC = () => {
                                 </td>
                                 <td>
                                     <div>
-                                        <DownloadSolutionTemplate
+                                        <DownloadFileById
                                             buttonName="Download"
-                                            solutionTemplateFileId={task?.solutionTemplateFileId}
+                                            fileId={submission.sourceCodeFileId}
                                         />
                                     </div>
                                 </td>

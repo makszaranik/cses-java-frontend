@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import FileUpload from "../files/FileUpload.tsx";
 import { SubmissionFileType } from "../../types";
+const host = import.meta.env.VITE_BACKEND_URL;
+
 
 const TeacherCreateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
     const [form, setForm] = useState({
@@ -55,7 +57,7 @@ const TeacherCreateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
         setLoading(true);
 
         try {
-            const res = await fetch("http://localhost:8000/api/tasks/create", {
+            const res = await fetch(`${host}/api/tasks/create`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",

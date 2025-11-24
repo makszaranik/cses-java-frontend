@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Alert, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+const host = import.meta.env.VITE_BACKEND_URL;
+
 
 interface RepoDto {
     id: string;
@@ -10,14 +12,9 @@ interface RepoDto {
 interface GitHubFileUploadProps {
     taskId: string;
     autoLoad?: boolean;
-    apiBase?: string;
 }
 
-const GitHubFileUpload: React.FC<GitHubFileUploadProps> = ({
-                                                               taskId,
-                                                               autoLoad = false,
-                                                               apiBase = "http://localhost:8000/api"
-                                                           }) => {
+const GitHubFileUpload: React.FC<GitHubFileUploadProps> = ({taskId, autoLoad = false}) => {
     const [repos, setRepos] = useState<RepoDto[]>([]);
     const [selected, setSelected] = useState<string>("");
     const [loadingRepos, setLoadingRepos] = useState(false);
@@ -36,7 +33,7 @@ const GitHubFileUpload: React.FC<GitHubFileUploadProps> = ({
         setLoadingRepos(true);
 
         try {
-            const resp = await fetch(`${apiBase}/users/github-repos`, {
+            const resp = await fetch(`${host}/api/users/github-repos`, {
                 credentials: "include"
             });
             if (!resp.ok) throw new Error();
@@ -66,7 +63,7 @@ const GitHubFileUpload: React.FC<GitHubFileUploadProps> = ({
 
         try {
             const zipResp = await fetch(
-                `${apiBase}/files/github-save-zip/${selected}`,
+                `${host}/files/github-save-zip/${selected}`,
                 { method: "GET", credentials: "include" }
             );
 
@@ -84,7 +81,7 @@ const GitHubFileUpload: React.FC<GitHubFileUploadProps> = ({
             const zipFile = await zipResp.json();
             const fileId = zipFile.id;
 
-            const submitResp = await fetch(`${apiBase}/tasks/submit`, {
+            const submitResp = await fetch(`${host}/tasks/submit`, {
                 method: "POST",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

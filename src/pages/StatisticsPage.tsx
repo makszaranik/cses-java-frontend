@@ -5,7 +5,7 @@ import TabsNavigation from "../components/ui/TabsNavigation.tsx";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import type {IProblem} from "../types";
-
+const host = import.meta.env.VITE_BACKEND_URL;
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const StatisticsPage: React.FC = () => {
@@ -16,7 +16,7 @@ const StatisticsPage: React.FC = () => {
 
     useEffect(() => {
         async function loadTask() {
-            const res = await fetch(`http://localhost:8000/api/tasks/${id}`, {
+            const res = await fetch(`${host}/api/tasks/${id}`, {
                 credentials: "include"
             });
             const data = await res.json();
@@ -31,7 +31,7 @@ const StatisticsPage: React.FC = () => {
         const load = async () => {
             try {
                 const res = await fetch(
-                    `http://localhost:8000/api/users/statistics/${id}`,
+                    `${host}/api/users/statistics/${id}`,
                     { credentials: "include" }
                 );
 

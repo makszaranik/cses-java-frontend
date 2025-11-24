@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {Button} from "react-bootstrap";
 import {SubmissionFileType} from "../../types";
+const host = import.meta.env.VITE_BACKEND_URL;
 
 interface FileUploadProps {
     fileType: SubmissionFileType;
@@ -41,7 +42,7 @@ const FileUpload: React.FC<FileUploadProps> = ({fileType, buttonText="upload", o
             fd.append('file', file);
             fd.append('fileType', fileType.toString());
 
-            const res = await fetch("http://localhost:8000/api/files/upload", {
+            const res = await fetch(`${host}/api/files/upload`, {
                 method: "POST",
                 credentials: "include",
                 body: fd

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/ui/Navbar.tsx";
 import { Button, Table } from "react-bootstrap";
+const host = import.meta.env.VITE_BACKEND_URL;
 
 interface IUser {
     id: string;
@@ -14,7 +15,7 @@ const AdminPanelPage: React.FC = () => {
 
     const loadUsers = async () => {
         try {
-            const res = await fetch("http://localhost:8000/api/users", {
+            const res = await fetch(`${host}/api/users`, {
                 credentials: "include"
             });
             const data = await res.json();
@@ -33,7 +34,7 @@ const AdminPanelPage: React.FC = () => {
         setLoading(true);
 
         try {
-            const res = await fetch(`http://localhost:8000/api/users/${userId}/grant-teacher`, {
+            const res = await fetch(`${host}/api/users/${userId}/grant-teacher`, {
                 method: "POST",
                 credentials: "include"
             });
