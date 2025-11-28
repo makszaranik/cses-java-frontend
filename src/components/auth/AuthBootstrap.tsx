@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useAuthStore } from "../../state";
+const host = import.meta.env.VITE_BACKEND_URL;
 
 const AuthBootstrap = () => {
     const user = useAuthStore(s => s.user);
@@ -8,7 +9,7 @@ const AuthBootstrap = () => {
     useEffect(() => {
         if (user) return;
 
-        fetch("http://localhost:8000/api/users/me", { credentials: "include" })
+        fetch(`${host}/api/users/me`, { credentials: "include" })
             .then(r => (r.ok ? r.json() : null))
             .then(data => {
                 if (data) {

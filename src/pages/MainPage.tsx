@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import TabsNavigation from "../components/ui/TabsNavigation.tsx";
-import type IProblem from "../types";
+import type {IProblem} from "../types";
 import ProblemsTable from "../components/problems/ProblemsTable.tsx";
 import Navbar from "../components/ui/Navbar.tsx";
+const host = import.meta.env.VITE_BACKEND_URL;
 
 const MainPage: React.FC = () => {
     const [problems, setProblems] = useState<IProblem[]>([]);
@@ -11,7 +12,7 @@ const MainPage: React.FC = () => {
     useEffect(() => {
         const fetchProblems = async () => {
             try {
-                const response = await fetch("http://localhost:8000/api/tasks", {
+                const response = await fetch(`${host}/api/tasks`, {
                     credentials: "include"
                 });
                 if (!response.ok) {
@@ -31,16 +32,15 @@ const MainPage: React.FC = () => {
 
     return (
         <div>
-            <Navbar />
+            <Navbar/>
             <div className="text-3xl ml-60 mt-6 font-bold">CSES Problem Set</div>
             <TabsNavigation options={[
-                { value: 'tasks', path: '/problemset' },
-                { value: 'stats', path: '/stats' }
-            ]} />
+                {value: 'tasks', path: '/problemset'},
+            ]}/>
             {loading ? (
                 <div className="ml-60 mt-4">Loading problems...</div>
             ) : (
-                <ProblemsTable problems={problems} />
+                <ProblemsTable problems={problems}/>
             )}
         </div>
     );

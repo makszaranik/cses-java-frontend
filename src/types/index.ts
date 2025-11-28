@@ -17,7 +17,7 @@ export interface ISubmission {
     taskId: string;
     userId: string;
     sourceCodeFileId: string;
-    logs: string;
+    logs: Record<string, string>;
     status: SubmissionStatus;
     score: number;
     createdAt: Date;

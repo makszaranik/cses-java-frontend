@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import FileUpload from "../files/FileUpload.tsx";
 import { SubmissionFileType } from "../../types";
+const host = import.meta.env.VITE_BACKEND_URL;
+
 
 const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
     const [tasks, setTasks] = useState<any[]>([]);
@@ -50,7 +52,7 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
     };
 
     useEffect(() => {
-        fetch("http://localhost:8000/api/tasks/owned", { credentials: "include" })
+        fetch(`${host}/api/tasks/owned`, { credentials: "include" })
             .then(r => r.json())
             .then(setTasks)
             .catch(() => alert("Error loading tasks"));
@@ -58,7 +60,7 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
 
     const load = async (id: string) => {
         try {
-            const r = await fetch(`http://localhost:8000/api/tasks/${id}`, {
+            const r = await fetch(`${host}/api/tasks/${id}`, {
                 credentials: "include"
             });
             const data = await r.json();
@@ -95,7 +97,7 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
         setLoading(true);
 
         try {
-            const res = await fetch("http://localhost:8000/api/tasks/update", {
+            const res = await fetch(`${host}/api/tasks/update`, {
                 method: "PUT",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

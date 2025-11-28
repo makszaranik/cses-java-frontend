@@ -1,23 +1,25 @@
 import React from 'react';
 import { useAuthStore } from "../../state";
 import { Button } from "react-bootstrap";
+const host = import.meta.env.VITE_BACKEND_URL;
 
 interface TestsPageProps {
-    solutionTemplateFileId?: string;
+    fileId?: string;
+    buttonName?: string;
 }
 
-export const DownloadSolutionTemplate: React.FC<TestsPageProps> = ({solutionTemplateFileId}) => {
+export const DownloadFileById: React.FC<TestsPageProps> = ({fileId, buttonName="Download solution template"}) => {
     const user = useAuthStore(state => state.user);
 
     const handleOnClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        if (!solutionTemplateFileId) {
+        if (!fileId) {
             console.error("File ID not provided");
             return;
         }
 
         try {
-            const response = await fetch(`http://localhost:8000/api/files/download/${solutionTemplateFileId}`, {
+            const response = await fetch(`${host}/api/files/download/${fileId}`, {
                 credentials: "include"
             });
             if (!response.ok) throw new Error("Error downloading file");
@@ -37,9 +39,9 @@ export const DownloadSolutionTemplate: React.FC<TestsPageProps> = ({solutionTemp
     return (
         <>
             {user && (
-                <div className="ml-60">
-                    <Button onClick={handleOnClick} variant="dark" className="w-25">
-                        Download solution template
+                <div>
+                    <Button size="sm" onClick={handleOnClick} variant="dark">
+                        {buttonName}
                     </Button>
                 </div>
             )}

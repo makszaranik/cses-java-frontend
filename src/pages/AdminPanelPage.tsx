@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/ui/Navbar.tsx";
 import { Button, Table } from "react-bootstrap";
+import {useAuthStore} from "../state";
+const host = import.meta.env.VITE_BACKEND_URL;
 
 interface IUser {
     id: string;
@@ -11,10 +13,11 @@ interface IUser {
 const AdminPanelPage: React.FC = () => {
     const [users, setUsers] = useState<IUser[]>([]);
     const [loading, setLoading] = useState(false);
+    const currentUser = useAuthStore(state => state.user);
 
     const loadUsers = async () => {
         try {
-            const res = await fetch("http://localhost:8000/api/users", {
+            const res = await fetch(`${host}/api/users`, {
                 credentials: "include"
             });
             const data = await res.json();
@@ -33,7 +36,7 @@ const AdminPanelPage: React.FC = () => {
         setLoading(true);
 
         try {
-            const res = await fetch(`http://localhost:8000/api/users/${userId}/grant-teacher`, {
+            const res = await fetch(`${host}/api/users/${userId}/grant-teacher`, {
                 method: "POST",
                 credentials: "include"
             });
@@ -73,7 +76,9 @@ const AdminPanelPage: React.FC = () => {
                     </thead>
 
                     <tbody>
-                    {users.map((user, index) => (
+                    {users
+                        .filter((user: IUser) => user.id != currentUser?.id)
+                        .map((user: IUser, index) => (
                         <tr key={user.id}>
                             <td>{index + 1}</td>
                             <td>{user.id}</td>

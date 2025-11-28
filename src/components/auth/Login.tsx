@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Button } from "react-bootstrap";
 import { useAuthStore } from "../../state";
 import { useNavigate } from "react-router-dom";
+const host = import.meta.env.VITE_BACKEND_URL;
 
 const Login = () => {
     const navigate = useNavigate();
@@ -9,7 +10,7 @@ const Login = () => {
     const setUser = useAuthStore(s => s.setUser);
 
     useEffect(() => {
-        fetch("http://localhost:8000/api/users/me", { credentials: "include" })
+        fetch(`${host}/api/users/me`, { credentials: "include" })
             .then(r => r.ok ? r.json() : null)
             .then(data => {
                 if (data) {
@@ -21,8 +22,7 @@ const Login = () => {
     }, []);
 
     const handleLogin = () => {
-        window.location.href =
-            "http://localhost:8000/api/oauth2/authorization/github";
+        window.location.href = `${host}/api/oauth2/authorization/github`;
     };
 
     return (

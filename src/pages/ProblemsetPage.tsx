@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import ProblemsTable from "../components/problems/ProblemsTable.tsx";
 import type { IProblem } from "../types";
 import Navbar from "../components/ui/Navbar.tsx";
+const host = import.meta.env.VITE_BACKEND_URL;
 
 const ProblemsetPage: React.FC = () => {
     const [problems, setProblems] = useState<IProblem[]>([]);
@@ -10,7 +11,7 @@ const ProblemsetPage: React.FC = () => {
     useEffect(() => {
         const fetchProblems = async () => {
             try {
-                const response = await fetch("http://localhost:8000/api/tasks", {
+                const response = await fetch(`${host}/api/tasks`, {
                     credentials: "include"
                 });
                 if (!response.ok) {

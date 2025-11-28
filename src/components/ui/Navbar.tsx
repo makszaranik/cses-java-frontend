@@ -2,6 +2,7 @@ import React from 'react';
 import logo from '../../assets/img.png';
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../state";
+const host = import.meta.env.VITE_BACKEND_URL;
 
 const Navbar: React.FC = () => {
     const user = useAuthStore(state => state.user);
@@ -13,7 +14,7 @@ const Navbar: React.FC = () => {
 
     const handleLogout = async () => {
         try {
-            await fetch("http://localhost:8000/api/logout", {
+            await fetch(`${host}/api/logout`, {
                 method: "POST",
                 credentials: "include"
             });

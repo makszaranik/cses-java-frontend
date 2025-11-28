@@ -1,40 +1,47 @@
 import React, {useEffect, useState} from 'react';
 import Navbar from "../components/ui/Navbar.tsx";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import {Link, useParams, useNavigate} from "react-router-dom";
 import TabsNavigation from "../components/ui/TabsNavigation.tsx";
-import { useAuthStore } from "../state";
-import { SubmissionFileType } from "../types";
-import type { IProblem } from "../types";
+import {useAuthStore} from "../state";
+import {SubmissionFileType} from "../types";
+import type {IProblem} from "../types";
 import FileUpload from "../components/files/FileUpload.tsx";
 import GitHubFileUpload from "../components/files/GitHubFileUpload.tsx";
-import {Button} from "react-bootstrap";
-import {DownloadSolutionTemplate} from "../components/problems/DownloadSolutionTemplate.tsx";
+import {Alert, Button} from "react-bootstrap";
+import {DownloadFileById} from "../components/problems/DownloadFileById.tsx";
+
+const host = import.meta.env.VITE_BACKEND_URL;
 
 const ProblemSubmissionPage: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    const {id} = useParams<{ id: string }>();
     const user = useAuthStore(state => state.user);
     const navigate = useNavigate();
     const taskId = id ?? "";
     const [task, setTask] = useState<IProblem | null>(null);
-
     const [mode, setMode] = useState<"FILE" | "REPO" | "TEMPLATE">("FILE");
     const [uploadedFileId, setUploadedFileId] = useState<string | null>(null);
 
+    const [alert, setAlert] = useState<string | null>(null);
+    const alertUser = (msg: string) => {
+        setAlert(msg);
+        setTimeout(() => setAlert(null), 2000);
+    };
 
     useEffect(() => {
         async function loadTask() {
-            const res = await fetch(`http://localhost:8000/api/tasks/${taskId}`, {
+            const res = await fetch(`${host}/api/tasks/${taskId}`, {
                 credentials: "include"
             });
             const data = await res.json();
             setTask(data);
         }
+
         loadTask();
     }, [taskId]);
 
     async function handleSubmitSolution() {
         if (!uploadedFileId) {
-            alert("Please upload file first");
+            alertUser("Please upload file first.");
             return;
         }
 
@@ -44,28 +51,42 @@ const ProblemSubmissionPage: React.FC = () => {
                 sourceCodeFileId: uploadedFileId
             });
 
-            const res = await fetch("http://localhost:8000/api/tasks/submit", {
+            const res = await fetch(`${host}/api/tasks/submit`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {"Content-Type": "application/json"},
                 credentials: "include",
                 body
             });
 
-            if (!res.ok) throw new Error("Submission failed");
+            if (!res.ok) {
+                const problem = await res.json().catch(() => null);
+
+                if (res.status === 403 && problem?.title === "Submission Not Allowed") {
+                    alertUser(problem.detail);
+                    return;
+                }
+
+                alertUser("Submission error.");
+                return;
+            }
 
             const data = await res.json();
-            const submissionId = data.id;
+            navigate(`/problemset/results/${taskId}`, {state: {submissionId: data.id}});
 
-            navigate(`/problemset/results/${taskId}`, { state: { submissionId } });
-        } catch (err) {
-            console.error(err);
-            alert("Submission error");
+        } catch {
+            alertUser("Submission error.");
         }
     }
 
     return (
         <>
-            <Navbar />
+            <Navbar/>
+
+            {alert && (
+                <Alert variant="danger" className="m-3">
+                    {alert}
+                </Alert>
+            )}
 
             <Link
                 to="/problemset"
@@ -76,10 +97,10 @@ const ProblemSubmissionPage: React.FC = () => {
 
             <TabsNavigation
                 options={[
-                    { value: 'tasks', path: '/problemset' },
-                    { value: 'submit', path: `/problemset/submit/${taskId}` },
-                    { value: 'result', path: `/problemset/results/${taskId}` },
-                    { value: 'statistics', path: `/problemset/statistics/${taskId}` }
+                    {value: 'tasks', path: '/problemset'},
+                    {value: 'submit', path: `/problemset/submit/${taskId}`},
+                    {value: 'result', path: `/problemset/results/${taskId}`},
+                    {value: 'statistics', path: `/problemset/statistics/${taskId}`}
                 ]}
             />
 
@@ -109,6 +130,7 @@ const ProblemSubmissionPage: React.FC = () => {
                             />
                             Select repository
                         </label>
+
                         <label>
                             <input
                                 type="radio"
@@ -141,12 +163,14 @@ const ProblemSubmissionPage: React.FC = () => {
                     )}
 
                     {mode === "REPO" && (
-                        <GitHubFileUpload taskId={taskId} autoLoad={true} />
+                        <GitHubFileUpload taskId={taskId} autoLoad={true}/>
                     )}
 
-                    {mode === "TEMPLATE" && (
-                        <DownloadSolutionTemplate solutionTemplateFileId={task?.solutionTemplateFileId}/>
-                    )}
+                    <div className="ml-60">
+                        {mode === "TEMPLATE" && (
+                            <DownloadFileById fileId={task?.solutionTemplateFileId}/>
+                        )}
+                    </div>
                 </>
             )}
         </>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
+const host = import.meta.env.VITE_BACKEND_URL;
 
 const TeacherDeleteTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
     const [tasks, setTasks] = useState<Array<any>>([]);
@@ -10,7 +11,7 @@ const TeacherDeleteTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
     useEffect(() => {
         async function fetchTasks() {
             try {
-                const res = await fetch("http://localhost:8000/api/tasks/owned", {
+                const res = await fetch(`${host}/api/tasks/owned`, {
                     credentials: "include"
                 });
 
@@ -36,7 +37,7 @@ const TeacherDeleteTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
         setError(null);
 
         try {
-            const res = await fetch("http://localhost:8000/api/tasks/delete", {
+            const res = await fetch(`${host}/api/tasks/delete`, {
                 method: "DELETE",
                 credentials: "include",
                 headers: {
