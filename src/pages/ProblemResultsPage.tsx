@@ -176,7 +176,7 @@ const ProblemResultsPage: React.FC = () => {
 
                         {submissions.length === 0 && (
                             <tr>
-                                <td colSpan={4}>No submissions yet.</td>
+                                <td>No submissions yet.</td>
                             </tr>
                         )}
                         </tbody>
@@ -196,12 +196,10 @@ const ProblemResultsPage: React.FC = () => {
                             style={{maxHeight: '500px', overflow: 'auto', whiteSpace: 'pre-wrap'}}
                         >
                             {["BUILD", "LINTER", "TEST"]
-                                .filter(stage => trackedSubmission.logs[stage])
                                 .map(stage => (
                                     <div key={stage} className="mb-4">
                                         <h5 className="fw-bold text-uppercase">{stage}</h5>
-                                        <pre
-                                            className="bg-white p-2 border rounded">{trackedSubmission.logs[stage]}</pre>
+                                        <pre className="bg-white p-2 border rounded">{trackedSubmission.logs[stage]}</pre>
                                         <hr/>
                                     </div>
                                 ))}

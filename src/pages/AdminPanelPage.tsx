@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/ui/Navbar.tsx";
 import { Button, Table } from "react-bootstrap";
+import {useAuthStore} from "../state";
 const host = import.meta.env.VITE_BACKEND_URL;
 
 interface IUser {
@@ -12,6 +13,7 @@ interface IUser {
 const AdminPanelPage: React.FC = () => {
     const [users, setUsers] = useState<IUser[]>([]);
     const [loading, setLoading] = useState(false);
+    const currentUser = useAuthStore(state => state.user);
 
     const loadUsers = async () => {
         try {
@@ -74,7 +76,9 @@ const AdminPanelPage: React.FC = () => {
                     </thead>
 
                     <tbody>
-                    {users.map((user, index) => (
+                    {users
+                        .filter((user: IUser) => user.id != currentUser?.id)
+                        .map((user: IUser, index) => (
                         <tr key={user.id}>
                             <td>{index + 1}</td>
                             <td>{user.id}</td>
