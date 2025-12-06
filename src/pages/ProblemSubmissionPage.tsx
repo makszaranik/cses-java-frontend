@@ -92,7 +92,7 @@ const ProblemSubmissionPage: React.FC = () => {
                 to="/problemset"
                 className="decoration-none text-2xl ml-60 mt-2 font-bold text-black no-underline"
             >
-                CSES Problem Set
+                CSES Список задач
             </Link>
 
             <TabsNavigation
@@ -118,7 +118,7 @@ const ProblemSubmissionPage: React.FC = () => {
                                 checked={mode === "FILE"}
                                 onChange={() => setMode("FILE")}
                             />
-                            Upload file
+                            Завантажити файл
                         </label>
 
                         <label className="mr-4">
@@ -128,7 +128,7 @@ const ProblemSubmissionPage: React.FC = () => {
                                 checked={mode === "REPO"}
                                 onChange={() => setMode("REPO")}
                             />
-                            Select repository
+                            Вибрати репозиторій
                         </label>
 
                         <label>
@@ -138,7 +138,7 @@ const ProblemSubmissionPage: React.FC = () => {
                                 checked={mode === "TEMPLATE"}
                                 onChange={() => setMode("TEMPLATE")}
                             />
-                            Download solution template
+                            Завантажити шаблон рішення
                         </label>
                     </div>
 

@@ -28,15 +28,15 @@ const TeacherPanelPage = () => {
                 className="mb-3"
             >
                 <Tab eventKey="create" title="Create Task">
-                    <TeacherCreateTaskForm onSuccess={() => alertUser("Task has been created successfully.")}/>
+                    <TeacherCreateTaskForm onSuccess={() => alertUser("Задача створена успішно.")}/>
                 </Tab>
 
                 <Tab eventKey="update" title="Update Task">
-                    <TeacherUpdateTaskForm onSuccess={() => alertUser("Task has been updated successfully.")}/>
+                    <TeacherUpdateTaskForm onSuccess={() => alertUser("Задача оновленна успішно")}/>
                 </Tab>
 
                 <Tab eventKey="delete" title="Delete Task">
-                    <TeacherDeleteTaskForm onSuccess={() => alertUser("Task has been deleted successfully.")}/>
+                    <TeacherDeleteTaskForm onSuccess={() => alertUser("Задача видаленна успішно.")}/>
                 </Tab>
             </Tabs>
         </>

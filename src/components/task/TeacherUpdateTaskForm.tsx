@@ -4,7 +4,6 @@ import FileUpload from "../files/FileUpload.tsx";
 import { SubmissionFileType } from "../../types";
 const host = import.meta.env.VITE_BACKEND_URL;
 
-
 const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
     const [tasks, setTasks] = useState<any[]>([]);
     const [original, setOriginal] = useState<any>(null);
@@ -32,8 +31,8 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
     const validate = () => {
         const e: any = {};
 
-        if (!form.title.trim()) e.title = "Required";
-        if (!form.statement.trim()) e.statement = "Required";
+        if (!form.title.trim()) e.title = "Обов’язково";
+        if (!form.statement.trim()) e.statement = "Обов’язково";
 
         if (form.memoryRestriction < 6 || form.memoryRestriction > 512)
             e.memoryRestriction = "6–512";
@@ -45,7 +44,7 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
             e.lintersPoints = "0–100";
 
         if (form.submissionsNumberLimit < 1)
-            e.submissionsNumberLimit = "Must be ≥ 1";
+            e.submissionsNumberLimit = "Має бути ≥ 1";
 
         setErrors(e);
         return Object.keys(e).length === 0;
@@ -55,7 +54,7 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
         fetch(`${host}/api/tasks/owned`, { credentials: "include" })
             .then(r => r.json())
             .then(setTasks)
-            .catch(() => alert("Error loading tasks"));
+            .catch(() => alert("Помилка під час завантаження списку завдань"));
     }, []);
 
     const load = async (id: string) => {
@@ -80,7 +79,7 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
             });
 
         } catch {
-            alert("Error loading task");
+            alert("Помилка під час завантаження завдання");
         }
     };
 
@@ -108,7 +107,7 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
 
             onSuccess();
         } catch {
-            alert("Error updating");
+            alert("Помилка під час оновлення завдання");
         } finally {
             setLoading(false);
         }
@@ -116,13 +115,13 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
 
     return (
         <div className="border p-4 rounded mt-5">
-            <h4>Update Task</h4>
+            <h4>Оновити завдання</h4>
 
             <Form>
                 <Form.Group className="mt-2">
-                    <Form.Label>Select Task</Form.Label>
+                    <Form.Label>Оберіть завдання</Form.Label>
                     <Form.Select onChange={event => load(event.target.value)}>
-                        <option value="">-- select task --</option>
+                        <option value="">-- оберіть завдання --</option>
                         {tasks.map(task => (
                             <option key={task.id} value={task.id}>
                                 {task.id} — {task.title}
@@ -132,7 +131,7 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                 </Form.Group>
 
                 <Form.Group className="mt-2">
-                    <Form.Label>Title</Form.Label>
+                    <Form.Label>Назва</Form.Label>
                     <Form.Control
                         name="title"
                         value={form.title}
@@ -143,7 +142,7 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                 </Form.Group>
 
                 <Form.Group className="mt-2">
-                    <Form.Label>Statement</Form.Label>
+                    <Form.Label>Умова</Form.Label>
                     <Form.Control
                         as="textarea"
                         rows={3}
@@ -156,7 +155,7 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                 </Form.Group>
 
                 <Form.Group className="mt-2">
-                    <Form.Label>Memory Restriction</Form.Label>
+                    <Form.Label>Обмеження пам’яті</Form.Label>
                     <Form.Control
                         type="number"
                         name="memoryRestriction"
@@ -168,7 +167,7 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                 </Form.Group>
 
                 <Form.Group className="mt-2">
-                    <Form.Label>Tests Points</Form.Label>
+                    <Form.Label>Бали за тести</Form.Label>
                     <Form.Control
                         type="number"
                         name="testsPoints"
@@ -180,7 +179,7 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                 </Form.Group>
 
                 <Form.Group className="mt-2">
-                    <Form.Label>Linters Points</Form.Label>
+                    <Form.Label>Бали за лінтери</Form.Label>
                     <Form.Control
                         type="number"
                         name="lintersPoints"
@@ -192,7 +191,7 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                 </Form.Group>
 
                 <Form.Group className="mt-2">
-                    <Form.Label>Submissions Limit</Form.Label>
+                    <Form.Label>Ліміт спроб</Form.Label>
                     <Form.Control
                         type="number"
                         name="submissionsNumberLimit"
@@ -203,29 +202,29 @@ const TeacherUpdateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                     <Form.Control.Feedback type="invalid">{errors.submissionsNumberLimit}</Form.Control.Feedback>
                 </Form.Group>
 
-                <h6 className="mt-3">Replace files (optional)</h6>
+                <h6 className="mt-3">Замінити файли (необов’язково)</h6>
 
                 <FileUpload
                     fileType={SubmissionFileType.SOLUTION_TEMPLATE}
-                    buttonText="Replace solution template"
+                    buttonText="Замінити шаблон розв’язку"
                     onFileUploaded={id => setField("solutionTemplateFileId", id)}
                 />
 
                 <FileUpload
                     fileType={SubmissionFileType.TEST}
-                    buttonText="Replace tests"
+                    buttonText="Замінити тести"
                     onFileUploaded={id => setField("testsFileId", id)}
                 />
 
                 <FileUpload
                     fileType={SubmissionFileType.LINTER}
-                    buttonText="Replace linters"
+                    buttonText="Замінити лінтери"
                     onFileUploaded={id => setField("lintersFileId", id)}
                 />
 
                 <div className="mt-4">
                     <Button variant="warning" disabled={loading} onClick={handleSubmit}>
-                        {loading ? "Updating..." : "Update Task"}
+                        {loading ? "Оновлення..." : "Оновити завдання"}
                     </Button>
                 </div>
 

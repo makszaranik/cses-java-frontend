@@ -32,7 +32,7 @@ const ProblemPage: React.FC = () => {
     }, [id]);
 
     if (!id) {
-        return <div className="ml-60 mt-4 text-red-600">Invalid task id</div>;
+        return <div className="ml-60 mt-4 text-red-600">Неправильнинй task id</div>;
     }
 
     if (loading || !problem) {
@@ -47,7 +47,7 @@ const ProblemPage: React.FC = () => {
                 to='/problemset'
                 className="decoration-none text-2xl ml-60 mt-2 font-bold text-black no-underline"
             >
-                CSES Problem Set
+                CSES Список задач
             </Link>
 
             <TabsNavigation

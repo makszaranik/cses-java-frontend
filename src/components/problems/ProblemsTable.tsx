@@ -10,13 +10,13 @@ export interface ProblemsTableProps {
 const ProblemsTable: React.FC<ProblemsTableProps> = ({problems}) => {
     return (
         <div className="w-260">
-            <div className="text-3xl ml-60 font-bold">Problems</div>
+            <div className="text-3xl ml-60 font-bold">Задачі</div>
             <div className="ml-60 mt-2">
                 <Table striped bordered hover>
                     <thead>
                     <tr>
                         <th>№</th>
-                        <th>Problem name</th>
+                        <th>Назва задачі</th>
                     </tr>
                     </thead>
                     <tbody>

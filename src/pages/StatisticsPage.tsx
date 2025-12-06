@@ -95,7 +95,7 @@ const StatisticsPage: React.FC = () => {
                 to='/problemset'
                 className="decoration-none text-2xl ml-60 mt-2 font-bold text-black no-underline"
             >
-                CSES Problem Set
+                CSES Список задач
             </Link>
 
             <TabsNavigation
@@ -108,10 +108,10 @@ const StatisticsPage: React.FC = () => {
             />
 
             <div className="max-w-3xl mx-auto pt-1 p-5">
-                <h2 className="text-3xl font-semibold mb-4">Statistics for Task {task?.title}</h2>
+                <h2 className="text-3xl font-semibold mb-4"> Статистика по задачі {task?.title}</h2>
 
-                {loading && <div>Loading statistics...</div>}
-                {!loading && !data && <div>No statistics available.</div>}
+                {loading && <div>Статистика...</div>}
+                {!loading && !data && <div>Статистика</div>}
                 {pieData && <Pie data={pieData} options={{radius: "60%"}}/>}
             </div>
         </>

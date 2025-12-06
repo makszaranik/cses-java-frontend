@@ -30,7 +30,7 @@ const ProblemsetPage: React.FC = () => {
     }, []);
 
     if (loading) {
-        return <div className="ml-60 mt-4">Loading problems...</div>;
+        return <div className="ml-60 mt-4">Завантаження задач...</div>;
     }
 
     return (

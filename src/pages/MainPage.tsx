@@ -33,12 +33,12 @@ const MainPage: React.FC = () => {
     return (
         <div>
             <Navbar/>
-            <div className="text-3xl ml-60 mt-6 font-bold">CSES Problem Set</div>
+            <div className="text-3xl ml-60 mt-6 font-bold">CSES Список задач</div>
             <TabsNavigation options={[
                 {value: 'tasks', path: '/problemset'},
             ]}/>
             {loading ? (
-                <div className="ml-60 mt-4">Loading problems...</div>
+                <div className="ml-60 mt-4">Завантажуються задачі...</div>
             ) : (
                 <ProblemsTable problems={problems}/>
             )}

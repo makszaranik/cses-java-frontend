@@ -46,7 +46,7 @@ const AdminPanelPage: React.FC = () => {
                 throw new Error(errorBody.detail || "Unknown error");
             }
 
-            alert("Role updated successfully");
+            alert("Роль змінена успішно");
             await loadUsers();
 
         } catch (e: any) {
@@ -62,7 +62,7 @@ const AdminPanelPage: React.FC = () => {
             <Navbar />
 
             <div className="p-4">
-                <h3 className="mb-3">Admin Panel</h3>
+                <h3 className="mb-3">Адмін панель</h3>
 
                 <Table striped bordered hover>
                     <thead>
@@ -70,8 +70,8 @@ const AdminPanelPage: React.FC = () => {
                         <th>#</th>
                         <th>User ID</th>
                         <th>Username</th>
-                        <th>Role</th>
-                        <th>Grant Teacher</th>
+                        <th>Роль</th>
+                        <th>Дати права викладача</th>
                     </tr>
                     </thead>
 
@@ -90,7 +90,7 @@ const AdminPanelPage: React.FC = () => {
                                     disabled={loading || user.role === "TEACHER" || user.role === "ADMIN"}
                                     onClick={() => grantTeacher(user.id)}
                                 >
-                                    Grant teacher
+                                    Дати права викладача
                                 </Button>
                             </td>
                         </tr>

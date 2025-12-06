@@ -8,7 +8,7 @@ interface TestsPageProps {
     buttonName?: string;
 }
 
-export const DownloadFileById: React.FC<TestsPageProps> = ({fileId, buttonName="Download solution template"}) => {
+export const DownloadFileById: React.FC<TestsPageProps> = ({fileId, buttonName="Завантажити приклад рішення"}) => {
     const user = useAuthStore(state => state.user);
 
     const handleOnClick = async (event: React.MouseEvent<HTMLButtonElement>) => {

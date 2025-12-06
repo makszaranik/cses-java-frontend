@@ -15,12 +15,12 @@ const Problem: React.FC<ProblemProps> = ({title, statement, memoryRestriction, s
             <div className="flex space-x-8 text-sm ml-45 text-gray-700">
                 <div className="mt-4">
                     <span className="font-semibold">
-                        Memory limit:
+                        Обмеження по памяті:
                     </span> {memoryRestriction} MB
                 </div>
                 <div className="mt-4">
                     <span className="font-semibold">
-                        Submissions allowed:
+                        Доступна кількість спроб:
                     </span> {submissionsNumberLimit}
                 </div>
             </div>

@@ -4,7 +4,6 @@ import FileUpload from "../files/FileUpload.tsx";
 import { SubmissionFileType } from "../../types";
 const host = import.meta.env.VITE_BACKEND_URL;
 
-
 const TeacherCreateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
     const [form, setForm] = useState({
         title: "",
@@ -28,15 +27,15 @@ const TeacherCreateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
     const validate = () => {
         const e: any = {};
 
-        if (!form.title.trim()) e.title = "Required";
-        if (!form.statement.trim()) e.statement = "Required";
+        if (!form.title.trim()) e.title = "Обов’язково";
+        if (!form.statement.trim()) e.statement = "Обов’язково";
 
         if (form.memoryRestriction < 6 || form.memoryRestriction > 512)
             e.memoryRestriction = "6–512";
 
-        if (!form.solutionTemplateFileId) e.solutionTemplateFileId = "Required";
-        if (!form.testsFileId) e.testsFileId = "Required";
-        if (!form.lintersFileId) e.lintersFileId = "Required";
+        if (!form.solutionTemplateFileId) e.solutionTemplateFileId = "Обов’язково";
+        if (!form.testsFileId) e.testsFileId = "Обов’язково";
+        if (!form.lintersFileId) e.lintersFileId = "Обов’язково";
 
         if (form.testsPoints < 0 || form.testsPoints > 100)
             e.testsPoints = "0–100";
@@ -45,7 +44,7 @@ const TeacherCreateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
             e.lintersPoints = "0–100";
 
         if (form.submissionsNumberLimit < 1)
-            e.submissionsNumberLimit = "Must be ≥ 1";
+            e.submissionsNumberLimit = "Має бути ≥ 1";
 
         setErrors(e);
         return Object.keys(e).length === 0;
@@ -66,10 +65,10 @@ const TeacherCreateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
 
             if (!res.ok) throw new Error();
 
-            alert("Task created!");
+            alert("Завдання створено!");
             onSuccess();
         } catch {
-            alert("Error!");
+            alert("Помилка!");
         } finally {
             setLoading(false);
         }
@@ -77,11 +76,11 @@ const TeacherCreateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
 
     return (
         <div className="border p-4 rounded shadow-sm">
-            <h4>Create Task</h4>
+            <h4>Створити завдання</h4>
 
             <Form>
                 <Form.Group className="mt-2">
-                    <Form.Label>Title</Form.Label>
+                    <Form.Label>Назва</Form.Label>
                     <Form.Control
                         name="title"
                         value={form.title}
@@ -92,7 +91,7 @@ const TeacherCreateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                 </Form.Group>
 
                 <Form.Group className="mt-2">
-                    <Form.Label>Statement</Form.Label>
+                    <Form.Label>Умова</Form.Label>
                     <Form.Control
                         as="textarea"
                         rows={3}
@@ -105,7 +104,7 @@ const TeacherCreateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                 </Form.Group>
 
                 <Form.Group className="mt-2">
-                    <Form.Label>Memory Restriction</Form.Label>
+                    <Form.Label>Обмеження пам’яті</Form.Label>
                     <Form.Control
                         type="number"
                         name="memoryRestriction"
@@ -116,30 +115,30 @@ const TeacherCreateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                     <Form.Control.Feedback type="invalid">{errors.memoryRestriction}</Form.Control.Feedback>
                 </Form.Group>
 
-                <h6 className="mt-3">Solution Template File</h6>
+                <h6 className="mt-3">Файл шаблону розв’язку</h6>
                 <FileUpload
                     fileType={SubmissionFileType.SOLUTION_TEMPLATE}
-                    buttonText="Upload solution template"
+                    buttonText="Завантажити шаблон розв’язку"
                     onFileUploaded={id => setField("solutionTemplateFileId", id)}
                 />
                 {errors.solutionTemplateFileId && (
                     <div className="text-danger">{errors.solutionTemplateFileId}</div>
                 )}
 
-                <h6 className="mt-3">Tests File</h6>
+                <h6 className="mt-3">Файл тестів</h6>
                 <FileUpload
                     fileType={SubmissionFileType.TEST}
-                    buttonText="Upload tests"
+                    buttonText="Завантажити тести"
                     onFileUploaded={id => setField("testsFileId", id)}
                 />
                 {errors.testsFileId && (
                     <div className="text-danger">{errors.testsFileId}</div>
                 )}
 
-                <h6 className="mt-3">Linters File</h6>
+                <h6 className="mt-3">Файл лінтерів</h6>
                 <FileUpload
                     fileType={SubmissionFileType.LINTER}
-                    buttonText="Upload linters"
+                    buttonText="Завантажити лінтери"
                     onFileUploaded={id => setField("lintersFileId", id)}
                 />
                 {errors.lintersFileId && (
@@ -147,7 +146,7 @@ const TeacherCreateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                 )}
 
                 <Form.Group className="mt-3">
-                    <Form.Label>Points for Tests</Form.Label>
+                    <Form.Label>Бали за тести</Form.Label>
                     <Form.Control
                         type="number"
                         name="testsPoints"
@@ -159,7 +158,7 @@ const TeacherCreateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                 </Form.Group>
 
                 <Form.Group className="mt-3">
-                    <Form.Label>Points for Linters</Form.Label>
+                    <Form.Label>Бали за лінтери</Form.Label>
                     <Form.Control
                         type="number"
                         name="lintersPoints"
@@ -171,7 +170,7 @@ const TeacherCreateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
                 </Form.Group>
 
                 <Form.Group className="mt-3">
-                    <Form.Label>Submission Limit</Form.Label>
+                    <Form.Label>Ліміт спроб</Form.Label>
                     <Form.Control
                         type="number"
                         name="submissionsNumberLimit"
@@ -184,7 +183,7 @@ const TeacherCreateTaskForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess 
 
                 <div className="mt-4">
                     <Button variant="success" disabled={loading} onClick={handleSubmit}>
-                        {loading ? "Creating..." : "Create Task"}
+                        {loading ? "Створення..." : "Створити завдання"}
                     </Button>
                 </div>
             </Form>

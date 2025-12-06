@@ -125,7 +125,7 @@ const ProblemResultsPage: React.FC = () => {
                 to='/problemset'
                 className="decoration-none text-2xl ml-60 mt-2 font-bold text-black no-underline"
             >
-                CSES Problem Set
+                CSES Список задач
             </Link>
 
             <TabsNavigation
@@ -147,10 +147,10 @@ const ProblemResultsPage: React.FC = () => {
                         <thead>
                         <tr>
                             <th>Submission ID</th>
-                            <th>Status</th>
-                            <th>Score</th>
-                            <th>Logs</th>
-                            <th>Solution</th>
+                            <th>Статус</th>
+                            <th>Результат</th>
+                            <th>Логи</th>
+                            <th>Рішення</th>
                         </tr>
                         </thead>
 
@@ -162,7 +162,7 @@ const ProblemResultsPage: React.FC = () => {
                                 <td>{submission.score ?? "-"}</td>
                                 <td>
                                     <Button variant="dark" size="sm" onClick={() => handleShowLogsModal(submission)}>
-                                        Show
+                                        Показати
                                     </Button>
                                 </td>
                                 <td>
@@ -176,7 +176,7 @@ const ProblemResultsPage: React.FC = () => {
 
                         {submissions.length === 0 && (
                             <tr>
-                                <td>No submissions yet.</td>
+                                <td>Немає посилок.</td>
                             </tr>
                         )}
                         </tbody>

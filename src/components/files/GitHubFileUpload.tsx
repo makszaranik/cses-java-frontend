@@ -129,7 +129,7 @@ const GitHubFileUpload: React.FC<GitHubFileUploadProps> = ({taskId, autoLoad = f
                     disabled={loadingRepos}
                 >
                     {loadingRepos && <option>Loading...</option>}
-                    {!loadingRepos && repos.length === 0 && <option>No repositories found</option>}
+                    {!loadingRepos && repos.length === 0 && <option>Немає репозиторіїв</option>}
                     {repos.map(r => (
                         <option key={r.id} value={r.name}>
                             {r.name}

@@ -39,7 +39,7 @@ const Navbar: React.FC = () => {
                     {isTeacher && (
                         <>
                             <Link to="/teacher-panel" className="text-white hover:underline">
-                                Teacher Panel
+                                Панель Вчителя
                             </Link>
                             <span className="text-gray-400">|</span>
                         </>
@@ -48,12 +48,12 @@ const Navbar: React.FC = () => {
                     {isAdmin && (
                         <>
                             <Link to="/teacher-panel" className="text-white hover:underline">
-                                Teacher Panel
+                                Панель Вчителя
                             </Link>
                             <span className="text-gray-400">|</span>
 
                             <Link to="/admin-panel" className="text-white hover:underline">
-                                Admin Panel
+                                Панель Адміна
                             </Link>
                             <span className="text-gray-400">|</span>
                         </>
@@ -69,12 +69,12 @@ const Navbar: React.FC = () => {
                                 onClick={handleLogout}
                                 className="text-white hover:underline"
                             >
-                                Logout
+                                Вийти
                             </button>
                         </>
                     ) : (
                         <Link to="/login" className="text-white hover:underline">
-                            Login
+                            Увійти
                         </Link>
                     )}
                 </div>

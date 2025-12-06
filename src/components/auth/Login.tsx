@@ -28,16 +28,16 @@ const Login = () => {
     return (
         <div className="mt-8 ml-55 font-bold text-3xl">
             {user ? (
-                <>You are already logged in as {user.username}.</>
+                <> Ви вже аторизовані як {user.username}.</>
             ) : (
                 <>
-                    <div>Login</div>
+                    <div>Логін</div>
                     <Button
                         onClick={handleLogin}
                         className="mt-4 w-48 bg-gray-200 text-black py-1 rounded border"
                         variant="light"
                     >
-                        Login with GitHub
+                        Логін через GitHub
                     </Button>
                 </>
             )}
